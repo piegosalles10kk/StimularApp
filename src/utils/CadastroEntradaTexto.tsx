@@ -1,3 +1,5 @@
+import { KeyboardTypeOptions } from 'react-native';
+
 const secoes = [
     {
       id: 1,
@@ -6,7 +8,8 @@ const secoes = [
         {
           id: 1,
           label: 'Email',
-          placeholder: 'Digite seu email'
+          placeholder: 'Digite seu email',
+          name: 'email' 
         },
       ]
     },
@@ -17,12 +20,15 @@ const secoes = [
         {
             id: 1,
             label: 'Nome',
-            placeholder: 'Digite seu nome'          
+            placeholder: 'Digite seu nome' ,
+            name: 'nome'          
           },
           {
             id: 2,
             label: 'Telefone',
-            placeholder: 'Informe seu telefone'
+            placeholder: 'Informe seu telefone',
+            keyboardType: 'phone-pad',
+            name: 'telefone' 
           },
                        
       ]
@@ -34,7 +40,10 @@ const secoes = [
         {
           id: 1,
           label: 'Data de nascimento',
-          placeholder: 'Data de nascimento'
+          placeholder: 'Data de nascimento',
+          keyboardType: 'numeric',
+          name: 'dataDeNascimento', 
+          type: 'data' 
         }, 
                 
       ],
@@ -47,20 +56,22 @@ const secoes = [
         {
             id: 1,
             label: 'Senha',
-            placeholder: 'Digite sua senha'          
+            placeholder: 'Digite sua senha',
+            secureTextEntry : true,
+            name: 'senha'
+                      
           },
           {
             id: 2,
             label: 'Confirmar senha',
-            placeholder: 'Confirme sua senha'
+            placeholder: 'Confirme sua senha',
+            secureTextEntry : true,
+            name: 'confirmarSenha'
           },
                 
       ],
     },
-    {
-      id: 5,
-      titulo: 'Agora vamos fazer um pequeno teste para te avaliar!'
-    },
+    
   ]
 
   export { secoes };
