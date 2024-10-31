@@ -75,20 +75,20 @@ export default function PrincipalPaciente({ navigation }) {
                        borderRadius={10}>
                     <Conquista
                         uri="https://i.postimg.cc/7L8d3Nrs/Avatar23.png"
-                        titulo="Primeira conquista"
+                        titulo="Conquista 2"
                         avatarStyle={{ borderWidth: 1, borderColor: 'black' }}
                         
                     />
                     <Conquista
                         uri="https://cdn4.iconfinder.com/data/icons/avatars-xmas-giveaway/128/girl_avatar_child_kid-512.png"
-                        titulo="Segunda conquista"
+                        titulo="Conquista 1"
                         avatarStyle={{ borderWidth: 1, borderColor: 'black' }}
                         
                     /> 
 
                      <Conquista
                         uri="https://cdn.icon-icons.com/icons2/1736/PNG/512/4043238-avatar-boy-kid-person_113284.png"
-                        titulo="Segunda conquista"
+                        titulo="Conquista 3"
                         avatarStyle={{ borderWidth: 1, borderColor: 'black' }}
                         
                     />              
