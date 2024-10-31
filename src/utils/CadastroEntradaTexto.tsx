@@ -9,7 +9,8 @@ const secoes = [
           id: 1,
           label: 'Email',
           placeholder: 'Digite seu email',
-          name: 'email' 
+          name: 'email',
+          keyboardType: 'email-address'
         },
       ]
     },
@@ -41,7 +42,7 @@ const secoes = [
           id: 1,
           label: 'Data de nascimento',
           placeholder: 'Data de nascimento',
-          keyboardType: 'numeric',
+          keyboardType: 'number-pad',
           name: 'dataDeNascimento', 
           type: 'data' 
         }, 

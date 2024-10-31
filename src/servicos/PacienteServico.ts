@@ -1,7 +1,7 @@
 import api from "./api";
-import { Paciente } from "../interfaces/Paciente";
+import { UsuarioCadastro } from "../interfaces/UsuarioCadastro";
 
-export async function cadastrarPaciente(paciente: Paciente) {
+export async function cadastrarPaciente(paciente: UsuarioCadastro) {
     if(!paciente) return null;
 
     try{
@@ -13,4 +13,18 @@ export async function cadastrarPaciente(paciente: Paciente) {
         console.log(error);
         return null;
     };
+}
+
+export async function pegarDadosUsuario(id: string, token: string){
+    try {
+        const resultado = await api.get(`/user/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        return resultado.data;
+    }catch(error){
+        console.log(error);
+        return null
+    }
 }

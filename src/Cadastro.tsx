@@ -44,23 +44,23 @@ export default function Cadastro() {
 
   async function cadastrar() {
     const resultado = await cadastrarPaciente({
-        email: dados.email,
-        nome: dados.nome,
-        telefone: dados.telefone,
-        dataDeNascimento: dados.dataDeNascimento,
-        senha: dados.senha,
-        confirmarSenha: dados.confirmarSenha,
-        tipoDeConta: 'Paciente',
-        foto: 'https://i.postimg.cc/7L8d3Nrs/Avatar23.png',
-        profissional: [
-            {
-                idDoProfissional: "672243e4effa46003373d4f4",
-                nome: "Stimular" 
-            }
-        ],
-        validade: '30/11/2024',
-        moeda: 1,
-        nivel: 0
+          email: dados.email,
+          nome: dados.nome,
+          telefone: dados.telefone,
+          dataDeNascimento: dados.dataDeNascimento,
+          senha: dados.senha,
+          confirmarSenha: dados.confirmarSenha,
+          tipoDeConta: 'Paciente',
+          foto: 'https://i.postimg.cc/7L8d3Nrs/Avatar23.png',
+          profissional: [
+              {
+                  idDoProfissional: "672243e4effa46003373d4f4",
+                  nome: "Stimular" 
+              }
+          ],
+          validade: '30/11/2024',
+          moeda: 1,
+          nivel: 0
     });
 }
 

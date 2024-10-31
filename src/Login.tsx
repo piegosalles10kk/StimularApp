@@ -41,13 +41,11 @@ async function login(){
     const { token } = resultado
     AsyncStorage.setItem('token', token);
 
-    const tokenDecodigicado = jwtDecode(token) as any
-    const userId = tokenDecodigicado.userId;
-    const tipoDeConta = tokenDecodigicado.tipoDeConta;
+    const tokenDecodificado = jwtDecode(token) as any
+    const id = tokenDecodificado.id;
+    const tipoDeConta = tokenDecodificado.tipoDeConta;    
 
-    
-
-    AsyncStorage.setItem('userId', userId);
+    AsyncStorage.setItem('id', id);
     AsyncStorage.setItem('tipoDeConta', tipoDeConta);
 
     navigation.replace('Tabs');

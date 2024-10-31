@@ -1,5 +1,4 @@
-export interface Paciente {
-    
+export interface UsuarioCadastro {
         email: string;
         nome: string;
         telefone: string;
@@ -11,7 +10,9 @@ export interface Paciente {
          profissional: profissional[];
          validade: string;
          moeda: number;
-         nivel: number    
+         nivel: number 
+    
+           
 }
 
 export interface profissional{

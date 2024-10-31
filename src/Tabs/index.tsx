@@ -1,5 +1,5 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Dimensions, Platform } from 'react-native';
+import { Dimensions, Platform, Text } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import PrincipalPaciente from './Paciente/PrincipalPaciente';
@@ -13,10 +13,17 @@ import AtividadesAdmin from './Admin/AtividadesAdmin';
 import PerfilPaciente from './Paciente/PerfilPaciente';
 import PerfilProfissional from './Profissional/PerfilProfissional';
 import PerfilAdmin from './Admin/PerfilAdmin';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useState } from 'react';
 
 const Tab = createBottomTabNavigator();
 
-const tipoUsuario = 'Paciente';
+async function tipoConta() {
+    const tipoUsuario = await AsyncStorage.getItem('tipoDeConta');
+    return tipoUsuario;
+  }
+
+
 
 const { height } = Dimensions.get('window');
 const tabBarHeight = Platform.OS === 'ios' ? 80 : 55
@@ -90,7 +97,8 @@ const tabsAdmin = [
     },
 ];
 
-function getTabs(tipoUsuario) {
+ async function getTabs() {
+    const tipoUsuario = await tipoConta();
     if (tipoUsuario === "Paciente") {
         return tabsPaciente;
     } else if (tipoUsuario === "Profissional") {
@@ -103,27 +111,45 @@ function getTabs(tipoUsuario) {
 
 
 export default function Tabs() {
-    const tabs = getTabs(tipoUsuario);
+    const [ tabs, setTabs ] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    return (
+    useEffect(() => {
+        getTabs().then((tabs) => {
+            setTabs(tabs);
+            setLoading(false);
+    });
+      }, []);
+
+      
+
+      if (loading) {
+        return <Text>Carregando...</Text>;
+      }
+    
+      if (tabs.length === 0) {
+        return <Text>Nenhuma tela encontrada</Text>;
+      }
+    
+      return (
         <Tab.Navigator screenOptions={screenOptions}>
-            {tabs.map((tab) => (
-                <Tab.Screen
-                    key={tab.name}
-                    name={tab.name}
-                    component={tab.component}
-                    options={{
-                        headerShown: false,
-                        tabBarIcon: ({ color, size }) => (
-                            <Ionicons
-                                name={tab.icon}
-                                color={color}
-                                size={size}
-                            />
-                        )
-                    }}
-                />
-            ))}
+          {tabs.map((tab) => (
+            <Tab.Screen
+              key={tab.name}
+              name={tab.name}
+              component={tab.component}
+              options={{
+                headerShown: false,
+                tabBarIcon: ({ color, size }) => (
+                  <Ionicons
+                    name={tab.icon}
+                    color={color}
+                    size={size}
+                  />
+                )
+              }}
+            />
+          ))}
         </Tab.Navigator>
-    );
-}
+      );
+    }
