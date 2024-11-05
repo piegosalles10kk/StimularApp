@@ -25,6 +25,7 @@ const AtividadeCard = ({ dadosAtividades, listaAtividades }) => {
                 <VStack flexDirection='row' flex={1} maxWidth='90%'>
                     <Avatar
                         size='xl'
+                        borderWidth='1'
                         source={{ uri: dadosAtividades?.atividades[0]?.imagem }}
                     />
                     <VStack flexDirection='column' flexShrink={1}>
@@ -54,6 +55,7 @@ const AtividadeCard = ({ dadosAtividades, listaAtividades }) => {
                                     alt="imagem da atividade"
                                     size='md'
                                     mr='2%'
+                                    borderWidth='1'
                                     source={{ uri: atividade.fotoDaAtividade }}
                                 />
                                 <VStack flexDirection='column' alignItems='center'>

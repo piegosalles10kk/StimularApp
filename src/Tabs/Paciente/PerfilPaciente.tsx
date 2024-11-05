@@ -50,12 +50,9 @@ export default function PerfilPaciente({ navigation }) {
 
         if(resultado){
             setDadosUsuario(resultado);
-            const resultadoAtividade = await pegarGruposAtividadesNivel(token, resultado.user.nivel);            
             //console.log(resultado);           
-
             calculateUserIdade().then((idade) => setIdade(idade));
-            
-                                   
+                                
         }else{
             console.error("erro ao pegar os dados do usuario");           
         }
@@ -134,7 +131,7 @@ useEffect(() => {
             style={{ marginBottom: '10%', marginTop: '10%' }}
           >
             <VStack flex={1} backgroundColor='roxoClaro'
-            borderRadius='20'
+            borderRadius='20' borderWidth='2'
             >
                 <Titulo fontSize='sm' 
                 padding={3} 
@@ -148,9 +145,9 @@ useEffect(() => {
             </VStack>
 
             <VStack flex={1} backgroundColor='roxoClaro'
-            borderRadius='20'
+            borderRadius='20' borderWidth='2'
             >
-                <Titulo fontSize='sm' 
+                <Titulo fontSize='xs' 
                 padding={3} 
                 color='black' 
                 >Validade da assinatura</Titulo>

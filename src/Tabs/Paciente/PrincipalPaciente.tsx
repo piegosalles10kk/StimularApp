@@ -46,8 +46,8 @@ export default function PrincipalPaciente({ navigation }) {
 
         if(resultado){
             setDadosUsuario(resultado);
-            const resultadoAtividade = await pegarGruposAtividadesNivel(token, resultado.user.nivel);            
-            //console.log(resultado.user.nivel);
+            const resultadoAtividade = await pegarGruposAtividadesNivel(token, resultado.user.nivel, resultado.user.grupo);            
+            //console.log(resultado.user.grupo);
             
             setDadosAtividades(resultadoAtividade);
             setConquistasUsuarios(resultado.user.conquistas);
