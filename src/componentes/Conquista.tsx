@@ -5,7 +5,7 @@ import { Titulo } from './Titulo';
 
 const Conquista = ({ uri, titulo, containerStyle = {}, avatarStyle = {}, textStyle = {} }) => {
   return (
-    <VStack style={containerStyle} padding='2%'>
+    <VStack style={containerStyle} padding='2%' alignItems='center'>
       <Avatar
         source={{ uri }}
         style={{ width: 75, height: 75, ...avatarStyle }}
@@ -13,7 +13,11 @@ const Conquista = ({ uri, titulo, containerStyle = {}, avatarStyle = {}, textSty
         borderWidth='2'
         alignSelf='center'
       />
-      <Titulo style={textStyle} fontWeight='bold' fontSize='sm' color='black'>{titulo}</Titulo>
+      <Titulo style={textStyle} 
+      fontWeight='bold' 
+      fontSize='10' 
+      color='black'
+      >{titulo}</Titulo>
     </VStack>
   );
 };

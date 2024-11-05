@@ -13,22 +13,29 @@ export interface Alternativas {
   }
   
   export interface Atividades {
+    atividades:{
+    nomdeDaAtividade: string;
     fotoDaAtividade: string;
     tipoDeAtividade: string;
     exercicios: Exercicios[];
     pontuacaoTotalAtividade: number;
   }
+  }
   
   export interface GrupoAtividades {
-    numeroAtividade: number;
+    atividades:
+    {filter(arg0: (grupo: any) => boolean): unknown; 
+    nomeGrupo: string;
+    nivelDaAtividade: number;
+    imagem: string,
+    descricao: string,
     criador: {
       id: string;
       nome: string;
     };
     dominio: string[];
     atividades: Atividades[];
-    pontuacaoTotalDoGrupo: number;
-  }
+    pontuacaoTotalDoGrupo: number;}}
   
   export interface GruposDeAtividadesEmAndamento {
     grupoAtividadesId: string;
@@ -44,6 +51,7 @@ export interface Alternativas {
     dataInicio: Date;
     dataFinalizada: Date;
     respostasFinais: number;
+    pontuacaoPossivel: number;
     pontuacaoFinal: number;
   }
   
@@ -67,11 +75,19 @@ export interface Alternativas {
     idDoPaciente: string;
     nome: string;
   }
+
+  export interface ConquistaUsuario {
+    _id: string,
+    nome: string,
+    imagem: string,
+    descricao: string,
+    condicao: number
+  }
   
   export interface UsuarioGeral {
     user:{
         tipoDeConta: string;
-        conquistas: any[];
+        conquistas: ConquistaUsuario[];
         validade: string;
         moeda: number;
         nivel: number;

@@ -1,17 +1,34 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {  HStack, ScrollView, VStack} from "native-base";
+import {  HStack, ScrollView, View} from "native-base";
 import { useEffect, useState } from "react";
-import { pegarDadosUsuario } from "../../servicos/PacienteServico";
-import { UsuarioGeral } from "../../interfaces/UsuarioGeral";
-import { Botao } from "../../componentes/Botao";
 import { Titulo } from "../../componentes/Titulo";
 import { ImagemLogo } from "../../componentes/ImagemLogo";
 import Conquista from "../../componentes/Conquista";
+import AtividadeCard from "../../componentes/AtividadeCard";
+import { Botao } from "../../componentes/Botao";
 
+//Api
+import { pegarDadosUsuario } from "../../servicos/PacienteServico";
+import { pegarGruposAtividadesNivel } from "../../servicos/GrupoAtividadesServicos";
+import { ConquistaUsuario, GrupoAtividades, UsuarioGeral, Atividades, Exercicios } from "../../interfaces/UsuarioGeral";
+
+/**
+ * Tela principal do paciente
+ * 
+ * Mostra as conquistas do paciente, suas atividades em andamento e permite que ele tire suas dúvidas ou agende conosco
+ * 
+ * @param {object} navigation Navega o entre as telas
+ */
 export default function PrincipalPaciente({ navigation }) {
 
     const [dadosUsuario, setDadosUsuario] = useState({} as UsuarioGeral);
+    const [dadosAtividades, setDadosAtividades ] = useState({} as GrupoAtividades);
+    const [ listaAtividades, setListaAtividades ] = useState({} as Atividades);
+        
+    const [conquistasUsuario, setConquistasUsuarios] = useState({} as ConquistaUsuario) 
     const [carregado, setCarregando ] = useState(false);
+    
+    
 
     useEffect(() => {
         async function dadosUsuario(){            
@@ -23,9 +40,23 @@ export default function PrincipalPaciente({ navigation }) {
         if (!token) {
           console.error('erro ao pegar o token');
         }
+
         const resultado = await pegarDadosUsuario(usuarioID, token);
+         
+
         if(resultado){
-            setDadosUsuario(resultado);                        
+            setDadosUsuario(resultado);
+            const resultadoAtividade = await pegarGruposAtividadesNivel(token, resultado.user.nivel);            
+            //console.log(resultado.user.nivel);
+            
+            setDadosAtividades(resultadoAtividade);
+            setConquistasUsuarios(resultado.user.conquistas);
+            //console.log(resultadoAtividade.atividades[0]);
+
+            setListaAtividades(resultadoAtividade.atividades[0]);
+            //console.log(listaAtividades);
+            
+                                   
         }else{
             console.error("erro ao pegar os dados do usuario");           
         }
@@ -34,67 +65,82 @@ export default function PrincipalPaciente({ navigation }) {
     dadosUsuario();    
 }, [])
 
+return (
+    <ScrollView showsHorizontalScrollIndicator={false}>
+      <View>
+        <ImagemLogo
+          style={{
+            marginTop: '5%',
+            width: 200,
+            height: 150,
+          }}
+        />
+        {carregado && (
+          <Titulo
+            fontSize='2xl'
+            marginLeft='10%'
+            textAlign="left"
+            fontWeight="bold"
+            color="black"
+          >
+            {`Olá, ${dadosUsuario?.user?.nome?.split(' ')[0]}`}
+          </Titulo>
+        )}
+        {carregado && (
+          <View
+            style={{
+              marginTop: '5%',
+              alignSelf: 'center',
+              padding: '5%',
+              flexDirection: 'column',
+              flex: 1,
+              borderWidth: 3,
+              borderRadius: 20,
+              marginBottom: '5%',
+            }}
+          >
+            <Titulo textAlign='center' fontSize='xl'>Suas conquistas</Titulo>
+            <HStack
+              padding="2%"
+              backgroundColor='roxoClaro'
+              mt='1%'
+              alignSelf={"center"}
+              flex={1}
+              borderWidth={1}
+              borderRadius={10}
+              maxWidth='90%'
+              flexWrap='wrap'
+              style={{ marginBottom: 0 }}
+            >
+              {Object.values(conquistasUsuario).slice(Math.max(0, Object.values(conquistasUsuario)?.length - 3)).map((conquista?) => (
+                <Conquista
+                  key={conquista?._id}
+                  uri={conquista?.imagem}
+                  titulo={conquista?.nome}
+                  avatarStyle={{ borderWidth: 1, borderColor: 'black' }}
+                />
+              ))}
+            </HStack>
+          </View>
 
-    return (
-        <ScrollView>
-        <VStack>
-            <ImagemLogo
-                style={{
-                    marginTop: '10%',
-                    width: 200,
-                    height: 150,
-                  }}
-            />
-            {carregado && 
-                <Titulo
-                    fontSize='2xl'
-                    marginLeft='10%'
-                    textAlign="left"
-                    fontWeight="bold"
-                    color="black"
-                    >{`Olá, ${dadosUsuario?.user?.nome.split(' ')[0]}`}
-                    </Titulo>                                       
-                    }
-
-                   <VStack
-                     mt='5%'
-                     alignSelf={"center"}
-                     padding='5'
-                     flexDirection='column' 
-                     flex={1}
-                     borderWidth={3}
-                     borderRadius={20}>
-                     <Titulo textAlign='center' fontSize='xl'>Suas conquistas</Titulo>
-                     <HStack
-                       padding="2%"
-                       backgroundColor='roxoClaro'
-                       mt='1%'
-                       alignSelf={"center"} 
-                       flex={1}
-                       borderWidth={1}
-                       borderRadius={10}>
-                    <Conquista
-                        uri="https://i.postimg.cc/7L8d3Nrs/Avatar23.png"
-                        titulo="Conquista 2"
-                        avatarStyle={{ borderWidth: 1, borderColor: 'black' }}
-                        
-                    />
-                    <Conquista
-                        uri="https://cdn4.iconfinder.com/data/icons/avatars-xmas-giveaway/128/girl_avatar_child_kid-512.png"
-                        titulo="Conquista 1"
-                        avatarStyle={{ borderWidth: 1, borderColor: 'black' }}
-                        
-                    /> 
-
-                     <Conquista
-                        uri="https://cdn.icon-icons.com/icons2/1736/PNG/512/4043238-avatar-boy-kid-person_113284.png"
-                        titulo="Conquista 3"
-                        avatarStyle={{ borderWidth: 1, borderColor: 'black' }}
-                        
-                    />              
-                     </HStack>
-                   </VStack>
-        </VStack>
-        </ScrollView>
-    );
+        )}
+        {carregado && (
+          <AtividadeCard dadosAtividades={dadosAtividades} listaAtividades={listaAtividades} />
+        )}
+        
+        {carregado && (
+          <HStack
+            alignItems='center'
+            justifyContent='space-between'
+            paddingX={4}
+            space={4}
+            style={{ marginBottom: '10%' }}
+          >
+            <Botao style={{ flex: 1 }}>Tire suas dúvidas</Botao>
+            <Botao style={{ flex: 1 }}>Agende conosco</Botao>
+          </HStack>
+        )}
+      </View>
+    </ScrollView>
+  );
 }

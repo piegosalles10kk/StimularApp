@@ -1,5 +1,3 @@
-import { KeyboardTypeOptions } from 'react-native';
-
 const secoes = [
     {
       id: 1,

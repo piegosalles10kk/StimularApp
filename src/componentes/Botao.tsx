@@ -12,11 +12,11 @@ export function Botao({ children, autoSize = false, color, ...rest }: ButtonProp
   return (
     <Button
       w={autoSize ? 'auto' : '90%'}
-      bg={color || 'rosaEscuro'}
+      bg={color || 'roxoClaro'}
       borderRadius='lg'
       _text={{ color: "white", fontWeight:'bold'  }}
       mt={10}
-      _pressed={{ bg: 'roxoClaro' }}
+      _pressed={{ bg: 'rosaEscuro' }}
       {...rest}
     >
       {children}
