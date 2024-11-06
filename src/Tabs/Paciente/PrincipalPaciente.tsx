@@ -125,7 +125,10 @@ return (
 
         )}
         {carregado && (
-          <AtividadeCard dadosAtividades={dadosAtividades} listaAtividades={listaAtividades} />
+          <AtividadeCard 
+          dadosAtividades={dadosAtividades} 
+          listaAtividades={listaAtividades} 
+          titulo='Objetivo do dia' />
         )}
         
         {carregado && (

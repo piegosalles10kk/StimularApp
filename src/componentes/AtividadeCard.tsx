@@ -2,7 +2,7 @@ import React from 'react';
 import { VStack, HStack, Avatar, ScrollView, Image } from 'native-base'; // Supondo que você está usando o NativeBase
 import { Titulo } from './Titulo';
 
-const AtividadeCard = ({ dadosAtividades, listaAtividades }) => {
+const AtividadeCard = ({ dadosAtividades, listaAtividades, titulo }) => {
     return (
         <VStack
             alignSelf={"center"}
@@ -12,7 +12,7 @@ const AtividadeCard = ({ dadosAtividades, listaAtividades }) => {
             borderWidth={3}
             borderRadius={20}
         >
-            <Titulo textAlign='start' fontSize='xl'>Objetivos do dia:</Titulo>
+            <Titulo textAlign='start' fontSize='xl'>{titulo}</Titulo>
             
             <HStack
                 padding="2%"

@@ -8,8 +8,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 //Api
 import { pegarDadosUsuario } from "../../servicos/PacienteServico";
 import { pegarGruposAtividadesNivel } from "../../servicos/GrupoAtividadesServicos";
-import { ConquistaUsuario, GrupoAtividades, UsuarioGeral, Atividades, Exercicios } from "../../interfaces/UsuarioGeral";
-
+import { ConquistaUsuario, GrupoAtividades, UsuarioGeral, Atividades, Exercicios, GruposDeAtividadesFinalizadas } from "../../interfaces/UsuarioGeral";
+import AtividadeCard from "../../componentes/AtividadeCard";
+import Graficos from "../../componentes/Graficos";
 
 export default function AtividadesPaciente() {
     const listaCategorias = [
@@ -19,50 +20,67 @@ export default function AtividadesPaciente() {
         { id: 4, nome: 'Socioafetiva', icone: 'happy' }
     ];
 
+    const [dataFinalizadas, setDataFinalizadas] = useState({} as any);
+    const [pontuacoesFinais, setPontuacoesFinais] = useState({} as any);
+
     const [dadosUsuario, setDadosUsuario] = useState({} as UsuarioGeral);
     const [dadosAtividades, setDadosAtividades ] = useState({} as GrupoAtividades);
-    const [ listaAtividades, setListaAtividades ] = useState({} as Atividades);
+    const [dadosAtividadesFinalizadas, setAtividadesFinalizadas] = useState({} as GruposDeAtividadesFinalizadas);
+    const [listaAtividades, setListaAtividades ] = useState({} as Atividades);
         
-    const [conquistasUsuario, setConquistasUsuarios] = useState({} as ConquistaUsuario) 
+    const [conquistasUsuario, setConquistasUsuarios] = useState({} as ConquistaUsuario);
+    
+    const [carregadoGrafico, setCarregandoGrafico ] = useState(false);
     const [carregado, setCarregando ] = useState(false);
-    
-    
-
     
     useEffect(() => {
         async function dadosUsuario(){            
-        const usuarioID = await AsyncStorage.getItem('id');
-        if(!usuarioID) {
-            console.error('erro ao pegar o id do usario');
-        };
-        const token = await AsyncStorage.getItem('token');
-        if (!token) {
-          console.error('erro ao pegar o token');
+            const usuarioID = await AsyncStorage.getItem('id');
+            if(!usuarioID) {
+                console.error('erro ao pegar o id do usario');
+            };
+            const token = await AsyncStorage.getItem('token');
+            if (!token) {
+              console.error('erro ao pegar o token');
+            }
+
+            const resultado = await pegarDadosUsuario(usuarioID, token);
+
+            if(resultado){
+                setDadosUsuario(resultado);
+                const resultadoAtividade = await pegarGruposAtividadesNivel(token, resultado.user.nivel, resultado.user.grupo);            
+                setAtividadesFinalizadas(resultado.user.gruposDeAtividadesFinalizadas);
+
+                // Extraindo os dados desejados
+                const dataFinalizadasTemp = (Object.values(resultado.user.gruposDeAtividadesFinalizadas).map((atividade: GruposDeAtividadesFinalizadas) => atividade.dataFinalizada));
+                const pontuacoesFinaisTemp = (Object.values(resultado.user.gruposDeAtividadesFinalizadas).map((atividade: GruposDeAtividadesFinalizadas) => atividade.porcentagem));
+                //console.log(dataFinalizadasTemp, pontuacoesFinaisTemp);
+
+                setDataFinalizadas(dataFinalizadasTemp);
+                setPontuacoesFinais(pontuacoesFinaisTemp);
+                
+                setDadosAtividades(resultadoAtividade);
+                setConquistasUsuarios(resultado.user.conquistas);
+                setListaAtividades(resultadoAtividade.atividades[0]);
+
+                setCarregando(true);
+            } else {
+                console.error("erro ao pegar os dados do usuario");           
+            }
         }
+        dadosUsuario();
+    }, []);
 
-        const resultado = await pegarDadosUsuario(usuarioID, token);
-         
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            if (dataFinalizadas.length && pontuacoesFinais.length) {
+                setCarregandoGrafico(true);
+                clearInterval(intervalId);
+            }
+        }, 1000); // Verifica a cada 1 segundo
 
-        if(resultado){
-            setDadosUsuario(resultado);
-            const resultadoAtividade = await pegarGruposAtividadesNivel(token, resultado.user.nivel);            
-            //console.log(resultado.user.nivel);
-            
-            setDadosAtividades(resultadoAtividade);
-            setConquistasUsuarios(resultado.user.conquistas);
-            //console.log(resultadoAtividade.atividades[0]);
-
-            setListaAtividades(resultadoAtividade.atividades[0]);
-            //console.log(listaAtividades);
-            
-                                   
-        }else{
-            console.error("erro ao pegar os dados do usuario");           
-        }
-        setCarregando(true);
-    }
-    dadosUsuario();    
-}, [])
+        return () => clearInterval(intervalId); // Limpa o intervalo quando o componente desmontar
+    }, [dataFinalizadas, pontuacoesFinais]);
 
     return (
         <ScrollView contentContainerStyle={{ alignItems: 'center' }}>
@@ -93,8 +111,8 @@ export default function AtividadesPaciente() {
                         space={2} // Pode ser ajustado
                         backgroundColor='roxoClaro'
                         borderRadius={20}
-                        
                     >
+
                         <VStack flexDirection='row' alignItems='center' space={2} flexWrap='nowrap'>
                             {listaCategorias.map((categoria) => (
                                 <Box
@@ -121,12 +139,42 @@ export default function AtividadesPaciente() {
                     </HStack>
                 </VStack>
 
-                <VStack>
+                <VStack width='90%' mt='5%'>
                     
-
+                {carregado && (
+                <AtividadeCard 
+                dadosAtividades={dadosAtividades} 
+                listaAtividades={listaAtividades} 
+                titulo='Sua próxima atividade'/>
+                )}
                 </VStack>
 
-            </VStack>
+                
+
+                    {carregadoGrafico && (
+                        <VStack width='90%' mt='5%' alignItems='center'>
+                        <VStack               
+                            paddingTop={5}
+                            paddingBottom={5}
+                            backgroundColor='roxoClaro'
+                            width='100%' 
+                            alignItems='center' 
+                            justifyContent='center'
+                            borderWidth='2'>
+                                <Titulo  fontSize='xl' bold color='black'>Desempenho em atividades</Titulo>
+                            </VStack>
+
+                                <VStack width='100%' alignItems='center' justifyContent='center' borderWidth='2' borderTopWidth={0}>
+                                    <Graficos               
+                                    labels={dataFinalizadas} 
+                                    data={pontuacoesFinais} 
+                                    quantidade={7}/>
+                                
+                                </VStack>
+                    </VStack>
+                    )}                      
+                 
+                </VStack>
         </ScrollView>
     );
 }

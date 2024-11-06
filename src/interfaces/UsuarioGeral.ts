@@ -50,9 +50,10 @@ export interface Alternativas {
     grupoAtividadesId: string;
     dataInicio: Date;
     dataFinalizada: Date;
-    respostasFinais: number;
+    respostasFinais: [];
     pontuacaoPossivel: number;
     pontuacaoFinal: number;
+    porcentagem: number;
   }
   
   export interface Diagnostico {
