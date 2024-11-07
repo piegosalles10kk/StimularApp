@@ -1,36 +1,34 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { VStack, View, ScrollView, Avatar, HStack, Modal, Icon } from "native-base";
+import { TouchableOpacity } from 'react-native';
+import { VStack, View, ScrollView, Avatar, HStack, Modal, Image } from "native-base";
 import { Botao } from "../../componentes/Botao";
 import { useEffect, useState } from "react";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 //Api
 import { pegarDadosUsuario } from "../../servicos/PacienteServico";
-import { pegarGruposAtividadesNivel } from "../../servicos/GrupoAtividadesServicos";
-import { ConquistaUsuario, GrupoAtividades, UsuarioGeral, Atividades, Exercicios } from "../../interfaces/UsuarioGeral";
+import {  UsuarioGeral } from "../../interfaces/UsuarioGeral";
 import { Titulo } from "../../componentes/Titulo";
 import { diagnosticos } from "../../utils/Diagnosticos";
+import EditableModal from "../../componentes/BotaoModal";
 
 
 export default function PerfilPaciente({ navigation }) {
 
     const [dadosUsuario, setDadosUsuario] = useState({} as UsuarioGeral);
-    const [idade, setIdade] = useState(0);
+    const [idade, setIdade] = useState({
+        anos: 0,
+        meses: 0,
+        idadeEmMeses: 0,
+      });
         
     const [carregado, setCarregando ] = useState(false);
     const [idadeCalculada, setIdadeCalculada] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     
-    const handleDeslogar = () => {
-        setModalVisible(true);
-      };
-      
-      const handleSim = () => {
-        deslogar();
-        setModalVisible(false);
-      };
-      
-      const handleNao = () => {
+    const renderizados = new Set();
+
+    const handleCancel = () => {
         setModalVisible(false);
       };
 
@@ -83,43 +81,134 @@ useEffect(() => {
 
     async function calculateUserIdade() {
         const dataDeNascimento = dadosUsuario.user.dataDeNascimento;
+    
+        // Extrai os componentes da data
         const partes = dataDeNascimento.split('/');
         const dia = parseInt(partes[0]);
-        const mes = parseInt(partes[1]) - 1;
+        const mes = parseInt(partes[1]) - 1; // Meses em JavaScript são 0-indexados
         const ano = parseInt(partes[2]);
-        const dataDeNascimentoValida = new Date(ano, mes, dia);
-        const idadeUsuario = Math.floor((new Date().getTime() - dataDeNascimentoValida.getTime()) / (1000 * 60 * 60 * 24 * 365));
-        const idadeUsuarioMeses = idadeUsuario * 12;
-        //console.log(idadeUsuarioMeses); // Verifique se o valor está sendo calculado corretamente
-        return idadeUsuarioMeses;
-      }
     
-
+        //console.log(`Data de Nascimento: ${dataDeNascimento}`);
+        //console.log(`Dia: ${dia}, Mês: ${mes + 1}, Ano: ${ano}`); // Mês corrigido para 1-index
+    
+        const dataDeNascimentoValida = new Date(ano, mes, dia);
+        const hoje = new Date();
+    
+       //console.log(`Data de Nascimento Validada: ${dataDeNascimentoValida}`);
+        //console.log(`Data de Hoje: ${hoje}`);
+    
+        // Calcula a idade em anos
+        let idadeAnos = hoje.getFullYear() - dataDeNascimentoValida.getFullYear();
+        //console.log(`Idade em Anos Inicial: ${idadeAnos}`);
+    
+        // Verifica se o aniversário já ocorreu este ano
+        if (hoje.getMonth() < mes || (hoje.getMonth() === mes && hoje.getDate() < dia)) {
+            idadeAnos--; // Se o aniversário ainda não ocorreu, subtrai um ano
+        }
+    
+        //console.log(`Idade em Anos Ajustada: ${idadeAnos}`);
+    
+        // Calcula os meses desde o último aniversário
+        let meses = hoje.getMonth() - mes;
+    
+        // Ajusta os meses se o aniversário ainda não ocorreu neste ano
+        if (meses < 0) {
+            meses += 12; // Adiciona 12 se no mês atual antes do mês do aniversário
+        }
+    
+        // Se o dia atual é anterior ao dia do aniversário e o resultado de meses não é 0, subtraímos um mês
+        if (hoje.getDate() < dia && meses > 0) {
+            meses--; // Subtrai um mês se o dia atual é antes do aniversário
+        }
+    
+        //console.log(`Meses Calculados (após ajustes): ${meses}`);
+    
+        // Cálculo total de meses
+        const idadeEmMeses = idadeAnos * 12 + meses; // Totaliza a idade em meses
+        //console.log(`Idade Total em Meses: ${idadeEmMeses}`);
+    
+        return {
+            anos: idadeAnos,
+            meses: meses,
+            idadeEmMeses: idadeEmMeses as number // Adicionando também o total de meses
+        };
+    }
+    
     return (
-        <ScrollView>
-            {carregado &&
+        <ScrollView showsVerticalScrollIndicator={false}>
+            {carregado &&           
+            <VStack alignItems='center' mt='-3%'>
             
-            <VStack alignItems='center' mt='15%'>
+            <VStack
+                maxHeight='30%' // adicionado
+                maxWidth='100%' // adicionado
+            >
+                <HStack
+                    mb='5%'
+                    alignItems='center'
+                    justifyContent='space-between'
+                    width='100%'
+                    position='relative'
+                    maxHeight='90%' // adicionado
+                    maxWidth='100%' // adicionado
+                    zIndex={1}>
+                        {dadosUsuario?.user?.grupo?.map((grupo, index) => {
+                            const diagnostico = diagnosticos.find(d => d.nome?.trim() === grupo.trim());
 
-            <Avatar
-                source={{ uri: dadosUsuario?.user?.foto}}
-                style={{ width: 180, height: 180 }}
-                alignSelf='center'
-                borderWidth='2'
-                borderColor='roxoClaro'
-            />
+                            if (diagnostico && !renderizados.has(diagnostico?.imagem)) {
+                                renderizados.add(diagnostico?.imagem); // Adicione o nome à lista de renderizados
+                                //console.log(renderizados);
+                            return (
+                                <Image
+                                maxHeight='100%'
+                                maxWidth='100%' 
+                                marginBottom='-5%'
+                                    key={index}
+                                    style={{
+                                        flex: 1,
+                                        minWidth: 100, // Define uma largura mínima
+                                        aspectRatio: 1,
+                                        resizeMode: 'cover',
+                                        
+                                    }}
+                                    source={diagnostico?.imagem}
+                                    alt={diagnostico?.nome}
+                                />
+                                );
+                                }
+                                return null;
+                                })}
+    
+                    <Avatar
+                        source={{ uri: dadosUsuario?.user?.foto }}
+                        style={{ width: 180, height: 180 }}
+                        position='absolute'
+                        top='50%'
+                        left='26%'
+                        alignSelf='center'
+                        borderWidth='2'
+                        borderColor='roxoClaro'
+                    />
+                </HStack>
 
-            <VStack flexDirection='row'>
+
+                </VStack>
+
+            <VStack flexDirection='row' mt='15%'>
             <Titulo
             mt='2%'
             bold
             color='black'
             >{dadosUsuario?.user?.nome}</Titulo>
-            <Ionicons name='create-outline' size={24} alignSelf='center' marginLeft='3%'/>
+
+            <TouchableOpacity onPress={() => navigation.navigate('AlterarPerfil')} activeOpacity={0.7}>
+                <Ionicons name='create-outline' size={24} alignSelf='center' marginLeft='3%'/>
+            </TouchableOpacity>
+            
             </VStack>
             
             <Titulo bold color='black' fontSize='md'>{`${dadosUsuario?.user?.grupo?.join(' | ')}`}</Titulo>
-            <Titulo fontSize='md'>{`${idade}(meses)`}</Titulo>
+            <Titulo fontSize='md'>{`${idade.idadeEmMeses}(meses)`}</Titulo>
 
             
 
@@ -187,22 +276,15 @@ useEffect(() => {
         );
     }
 })}
-
-        
-            <Botao onPress={handleDeslogar} mb='10%'>Sair</Botao>
-            <Modal
-                isOpen={modalVisible}
-                onClose={() => setModalVisible(false)}
-                >
-                <Modal.Content >
-                    
-                    <Modal.Body >
-                    <Modal.Header alignSelf='center' >Deseja realmente sair?</Modal.Header>
-                    <Botao onPress={handleSim} alignSelf='center' >Sim</Botao>
-                    <Botao onPress={handleNao} alignSelf='center' mb='2%'>Não</Botao>
-                    </Modal.Body>
-                </Modal.Content>
-                </Modal>        
+    <EditableModal
+      botao="Sair da conta"
+      bodyText="Ao clicar em sim voce irá sair da sua conta. Tem certeza que deseja continuar?"
+      confirmButtonText="Sim"
+      cancelButtonText="Não"
+      onConfirm={deslogar}
+      onCancel={handleCancel}
+    />
+               
             </VStack>}
         </ScrollView>
         

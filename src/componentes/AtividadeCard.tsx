@@ -7,12 +7,14 @@ const AtividadeCard = ({ dadosAtividades, listaAtividades, titulo }) => {
         <VStack
             alignSelf={"center"}
             padding='5'
+            paddingTop='2%'
             flexDirection='column'
             flex={1}
             borderWidth={3}
             borderRadius={20}
+            w='95%'
         >
-            <Titulo textAlign='start' fontSize='xl'>{titulo}</Titulo>
+            <Titulo textAlign='start' fontSize='xl' bold color='black'>{titulo}</Titulo>
             
             <HStack
                 padding="2%"
@@ -59,7 +61,7 @@ const AtividadeCard = ({ dadosAtividades, listaAtividades, titulo }) => {
                                     source={{ uri: atividade.fotoDaAtividade }}
                                 />
                                 <VStack flexDirection='column' alignItems='center'>
-                                    <Titulo fontSize='sm' bold>
+                                    <Titulo fontSize='sm' bold color='black'>
                                         {atividade.nomdeDaAtividade}
                                     </Titulo>
                                     <Titulo fontSize='xs' alignSelf='start'>

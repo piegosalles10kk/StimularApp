@@ -83,7 +83,7 @@ export default function AtividadesPaciente() {
     }, [dataFinalizadas, pontuacoesFinais]);
 
     return (
-        <ScrollView contentContainerStyle={{ alignItems: 'center' }}>
+        <ScrollView contentContainerStyle={{ alignItems: 'center' }} showsVerticalScrollIndicator={false}>
             <VStack
                 paddingTop={5}
                 paddingBottom={5}
@@ -154,8 +154,8 @@ export default function AtividadesPaciente() {
                     {carregadoGrafico && (
                         <VStack width='90%' mt='5%' alignItems='center'>
                         <VStack               
-                            paddingTop={5}
-                            paddingBottom={5}
+                            paddingTop={2}
+                            paddingBottom={2}
                             backgroundColor='roxoClaro'
                             width='100%' 
                             alignItems='center' 
@@ -164,7 +164,7 @@ export default function AtividadesPaciente() {
                                 <Titulo  fontSize='xl' bold color='black'>Desempenho em atividades</Titulo>
                             </VStack>
 
-                                <VStack width='100%' alignItems='center' justifyContent='center' borderWidth='2' borderTopWidth={0}>
+                                <VStack width='100%' alignItems='center' justifyContent='center' borderWidth='2' mt='3%' padding={4}>
                                     <Graficos               
                                     labels={dataFinalizadas} 
                                     data={pontuacoesFinais} 

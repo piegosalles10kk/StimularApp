@@ -66,7 +66,7 @@ export default function PrincipalPaciente({ navigation }) {
 }, [])
 
 return (
-    <ScrollView showsHorizontalScrollIndicator={false}>
+    <ScrollView showsVerticalScrollIndicator={false}>
       <View>
         <ImagemLogo
           style={{
@@ -80,7 +80,6 @@ return (
             fontSize='2xl'
             marginLeft='10%'
             textAlign="left"
-            fontWeight="bold"
             color="black"
           >
             {`Olá, ${dadosUsuario?.user?.nome?.split(' ')[0]}`}
@@ -91,6 +90,7 @@ return (
             style={{
               marginTop: '5%',
               alignSelf: 'center',
+              paddingTop: '2%',
               padding: '5%',
               flexDirection: 'column',
               flex: 1,
@@ -99,7 +99,7 @@ return (
               marginBottom: '5%',
             }}
           >
-            <Titulo textAlign='center' fontSize='xl'>Suas conquistas</Titulo>
+            <Titulo textAlign='center' fontSize='xl' color='black' bold>Suas conquistas</Titulo>
             <HStack
               padding="2%"
               backgroundColor='roxoClaro'

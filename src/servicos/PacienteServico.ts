@@ -28,3 +28,20 @@ export async function pegarDadosUsuario(id: string, token: string){
         return null
     }
 }
+
+export async function atualizarPaciente(paciente: UsuarioCadastro, idDoPaciente: string, token: string) {
+  if (!paciente) return null;
+
+  try {
+    const resultado = await api.put(`/user/${idDoPaciente}`, paciente, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log(resultado.data);
+    return resultado.data;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}

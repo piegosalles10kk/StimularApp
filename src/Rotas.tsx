@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Cadastro from "./Cadastro";
 import Login from "./Login";
 import Tabs from "./Tabs";
+import AlterarPerfil from "./Tabs/Paciente/AlterarPerfil";
 
 const Tab = createNativeStackNavigator();
 
@@ -27,6 +28,14 @@ export default function Rotas() {
                     component={Tabs} 
                     options={{ headerShown: false }}
                 />
+
+                <Tab.Screen 
+                    name="AlterarPerfil" 
+                    component={AlterarPerfil} 
+                    options={{ headerShown: false }}
+                    />
+
+                
             </Tab.Navigator>
         </NavigationContainer>
     );

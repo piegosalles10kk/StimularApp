@@ -33,19 +33,19 @@ const Graficos = ({ labels, data, quantidade }) => {
         fromNumber={100}
         fromZero
         chartConfig={{
-          backgroundColor: '#e26a00',
-          backgroundGradientFrom: '#f6c1c8',
-          backgroundGradientTo: '#fbace2',
+          backgroundColor: '#fff',
+          backgroundGradientFrom: '#fff',
+          backgroundGradientTo: '#fff',
           decimalPlaces: 0,
-          color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-          labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+          color: (opacity = 1) => `rgba(251, 172, 226, ${opacity})`,
+          labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
           style: {
             borderRadius: 16,
           },
           propsForDots: {
             r: '6',
             strokeWidth: '2',
-            stroke: '#fff',
+            stroke: '#fbace2',
           },
         }}
         bezier
