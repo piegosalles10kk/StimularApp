@@ -150,7 +150,7 @@ export default function GrupoAtividadesTela({ navigation }) {
                                 return null;
                                 })}
     
-                    <Avatar
+                    <Image
                         source={{ uri: dadosAtividades.grupoAtividades.imagem }}
                         style={{ width: 180, height: 180 }}
                         position='absolute'
