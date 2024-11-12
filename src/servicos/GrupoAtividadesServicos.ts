@@ -1,8 +1,8 @@
 import api from "./api";
 
-export async function pegarGruposAtividadesNivel(token: string, nivel: number, grupo: Array<string> = []) {
+export async function pegarGruposAtividadesNivel(token: string, nivel: number, grupo: Array<string> = [], tipoAtividade: Array<string> = []) {
     try {
-      const resultado = await api.get(`/grupos-atividades/nivel?nivel=${nivel}&grupo=${grupo}`, {
+      const resultado = await api.get(`/grupos-atividades/nivel?nivel=${nivel}&grupo=${grupo}&tipoDeAtividades=${tipoAtividade}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

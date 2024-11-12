@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
-import { Box, ScrollView, VStack, Avatar } from 'native-base';
+import { KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, Alert, Modal, StyleSheet, Text } from 'react-native';
+import { ScrollView, VStack, Avatar, HStack } from 'native-base';
+import { avatares } from '../../utils/Avatares';
 import { UsuarioGeral } from '../../interfaces/UsuarioGeral';
 import { EntradaTexto } from '../../componentes/EntradaTexto';
 import { Botao } from '../../componentes/Botao';
@@ -13,6 +14,7 @@ const DismissKeyboard = ({ children }) => (
     </TouchableWithoutFeedback>
 );
 
+
 const AlterarPerfil = ({ navigation }) => {
     const [dadosUsuario, setDadosUsuario] = useState({} as UsuarioGeral);
     const [dados, setDados] = useState({
@@ -22,19 +24,22 @@ const AlterarPerfil = ({ navigation }) => {
         dataDeNascimento: '',
         telefone: '',
     });
+    const [showModal, setShowModal] = useState(false);
+    const [selectedAvatar, setSelectedAvatar] = useState('');
+    const Avatares = avatares;
+    const [carregado, setCarregando ] = useState(false);
 
     const fetchUserData = async () => {
         try {
             const usuarioID = await AsyncStorage.getItem('id');
             const token = await AsyncStorage.getItem('token');
-
             if (!usuarioID || !token) {
                 console.error('Erro ao pegar ID ou token do usuário');
                 return;
             }
-
             const resultado = await pegarDadosUsuario(usuarioID, token);
             if (resultado) {
+                //console.log("Dados do usuário recebidos:", resultado); // Log para verificar os dados recebidos
                 setDadosUsuario(resultado);
                 setDados({
                     foto: resultado.user.foto,
@@ -42,7 +47,8 @@ const AlterarPerfil = ({ navigation }) => {
                     email: resultado.user.email,
                     dataDeNascimento: resultado.user.dataDeNascimento || '',
                     telefone: resultado.user.telefone,
-                });
+                }
+            ); setCarregando(true);
             } else {
                 console.error("Erro ao pegar os dados do usuário");
             }
@@ -63,24 +69,20 @@ const AlterarPerfil = ({ navigation }) => {
         try {
             const usuarioID = await AsyncStorage.getItem('id');
             const token = await AsyncStorage.getItem('token');
-
-            const paciente = {
-                foto: dados.foto,
+            const paciente: any = {
+                foto: selectedAvatar || dados.foto,
                 nome: dados.nome,
                 email: dados.email,
                 dataDeNascimento: dados.dataDeNascimento,
                 telefone: dados.telefone,
             };
-
-            // Logs
-            console.log('Dados do paciente a serem enviados:', JSON.stringify(paciente, null, 2));
-
+            //console.log("Dados a serem salvos:", paciente); // Log para verificar os dados que estão sendo salvos
             const resultado = await atualizarPaciente(paciente, usuarioID, token);
             if (resultado) {
-                Alert.alert('Sucesso', 'Dados atualizados com sucesso');
+                Alert.alert('Sucesso', 'Dados do usuário atualizados com sucesso');
                 navigation.replace('Tabs');
             } else {
-                Alert.alert("Erro ao atualizar os dados do paciente");
+                Alert.alert("Erro ao atualizar os dados do usuário");
             }
         } catch (error) {
             console.error("Erro ao atualizar os dados do paciente:", error);
@@ -88,29 +90,81 @@ const AlterarPerfil = ({ navigation }) => {
     };
 
     return (
+        
         <DismissKeyboard>
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
                 <ScrollView flex={1} p={5} contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
                     <VStack alignItems='center' mt='10%'>
-                        {/* Exibir o Avatar */}
-                        <Avatar size='200' source={{ uri: dados.foto }} />
-                        {/* Mapear os campos para exibição */}
+                    {carregado && (
+                        <TouchableWithoutFeedback onPress={() => setShowModal(true)}>
+                            <Avatar size='200' borderWidth='2' shadow='5' source={{ uri: selectedAvatar || dados.foto }} />                        
+                        </TouchableWithoutFeedback>
+                    )}
+
                         {['nome', 'email', 'dataDeNascimento', 'telefone'].map((campo, index) => (
                             <EntradaTexto
                                 key={index}
-                                label={campo.charAt(0).toUpperCase() + campo.slice(1)} // Capitaliza a primeira letra
-                                placeholder={dados[campo]} // Usa o valor atual como placeholder
-                                value={dados[campo]} // Mantém valor do estado
-                                keyboardType={campo === 'email' ? 'email-address' : campo === 'telefone' ? 'phone-pad' : 'default'}
-                                onChangeText={(text) => atualizarDados(campo, text)} // Atualiza o estado
+                                label={campo.charAt(0).toUpperCase() + campo.slice(1)}
+                                placeholder={dados[campo]}
+                                value={dados[campo]}
+                                keyboardType={campo === 'email' ? 'email-address' : campo === 'telefone' ? 'phone-pad' : campo === 'dataDeNascimento' ? 'number-pad' : 'default'}
+                                type={campo === 'dataDeNascimento' ? 'data' : 'default'}
+                                onChangeText={(text) => atualizarDados(campo, text)}
                             />
                         ))}
                     </VStack>
                     <Botao onPress={handleSalvar}>Salvar</Botao>
+
+                    {/* Modal para selecionar avatares */}
+                    <Modal visible={showModal} transparent animationType="slide">
+                        <VStack style={styles.modalContainer}>
+                            <VStack bg='white' p={5} borderRadius={10} style={styles.modalContent}>
+                                <Text style={styles.modalTitle}>Escolha seu novo Avatar</Text>
+                                <ScrollView>
+                                    {Array.from({ length: Math.ceil(Avatares.length / 3) }).map((_, rowIndex) => (
+                                        <HStack key={rowIndex} justifyContent='center' mb={4}>
+                                            {Avatares.slice(rowIndex * 3, rowIndex * 3 + 3).map((avatar, index) => (
+                                                <TouchableWithoutFeedback key={index} onPress={() => {
+                                                    console.log("Avatar selecionado:", avatar.imagemAvatar); // Log para confirmar qual avatar foi selecionado
+                                                    setSelectedAvatar(avatar.imagemAvatar);
+                                                    setShowModal(false);
+                                                }}>
+                                                    <Avatar size='71' source={{ uri: avatar.imagemAvatar }} style={styles.avatar} />
+                                                </TouchableWithoutFeedback>
+                                            ))}
+                                        </HStack>
+                                    ))}
+                                </ScrollView>
+                                <Botao alignSelf='center' onPress={() => setShowModal(false)}>Fechar</Botao>
+                            </VStack>
+                        </VStack>
+                    </Modal>
                 </ScrollView>
             </KeyboardAvoidingView>
         </DismissKeyboard>
     );
 };
+
+const styles = StyleSheet.create({
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        width: '90%',
+        maxHeight: '80%',
+    },
+    avatar: {
+        margin: 10,
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        textAlign: 'center',
+    },
+});
 
 export default AlterarPerfil;

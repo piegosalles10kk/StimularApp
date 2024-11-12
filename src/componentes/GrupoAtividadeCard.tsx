@@ -1,8 +1,27 @@
 import React from 'react';
-import { VStack, HStack, Avatar, ScrollView, Image } from 'native-base'; // Supondo que você está usando o NativeBase
+import { VStack, HStack, Avatar, ScrollView, Image } from 'native-base'; 
+import { TouchableOpacity } from 'react-native';
 import { Titulo } from './Titulo';
+import { useNavigation } from '@react-navigation/native';
 
-const AtividadeCard = ({ dadosAtividades, listaAtividades, titulo }) => {
+const AtividadeCard = ({ dadosAtividades, listaAtividades, titulo, }) => {
+
+    const navigation = useNavigation();
+
+    const handlePressAtividade = () => {
+        const grupoAtividadesId = dadosAtividades?.atividades[0]?._id; // Obtenha o ID do grupoAtividades
+        if (grupoAtividadesId) {
+            //navigation.navigate('GrupoAtividadesTela', { id: grupoAtividadesId as string }); // Navegue para NovaTela e passe o ID
+        }
+    };
+
+    const handlePressExercicio = () => {
+        const grupoAtividadesId = dadosAtividades?.atividades[0]?._id; // Obtenha o ID do grupoAtividades
+        if (grupoAtividadesId) {
+            //navigation.navigate('GrupoAtividadesTela', { id: grupoAtividadesId as string }); // Navegue para NovaTela e passe o ID
+        }
+    };
+
     return (
         <VStack
             alignSelf={"center"}
@@ -16,6 +35,7 @@ const AtividadeCard = ({ dadosAtividades, listaAtividades, titulo }) => {
         >
             <Titulo textAlign='start' fontSize='xl' bold color='black'>{titulo}</Titulo>
             
+            <TouchableOpacity onPress={handlePressAtividade} activeOpacity={0.5}>
             <HStack
                 padding="2%"
                 mt='1%'
@@ -47,11 +67,15 @@ const AtividadeCard = ({ dadosAtividades, listaAtividades, titulo }) => {
                     </VStack>
                 </VStack> 
             </HStack>
+            </TouchableOpacity>
 
             <VStack flexDirection='row' flex={1} maxWidth='90%'>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} mt='4%'>
+                
                     <VStack flexDirection='row' alignContent='center'>
                         {listaAtividades?.atividades.map((atividade, index) => (
+
+                            <TouchableOpacity onPress={handlePressExercicio} activeOpacity={0.5}>
                             <VStack key={index} flexDirection='row' padding='2'  flex={1} maxWidth='100%'>
                                 <Image
                                     alt="imagem da atividade"
@@ -64,16 +88,19 @@ const AtividadeCard = ({ dadosAtividades, listaAtividades, titulo }) => {
                                     <Titulo fontSize='sm' bold color='black'>
                                         {atividade.nomdeDaAtividade}
                                     </Titulo>
-                                    <Titulo fontSize='xs' alignSelf='start'>
+                                    <Titulo fontSize='xs' alignSelf='flex-start'>
                                         {`(${atividade.tipoDeAtividade})`}
                                     </Titulo>
+                                    
                                 </VStack>
                             </VStack>
+                            </TouchableOpacity>
                         ))}
                     </VStack>
                 </ScrollView>
             </VStack>
         </VStack>
+
     );
 };
 

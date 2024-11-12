@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Titulo } from "../../componentes/Titulo";
 import { ImagemLogo } from "../../componentes/ImagemLogo";
 import Conquista from "../../componentes/Conquista";
-import AtividadeCard from "../../componentes/AtividadeCard";
+import AtividadeCard from "../../componentes/GrupoAtividadeCard";
 import { Botao } from "../../componentes/Botao";
 
 //Api
@@ -12,13 +12,7 @@ import { pegarDadosUsuario } from "../../servicos/PacienteServico";
 import { pegarGruposAtividadesNivel } from "../../servicos/GrupoAtividadesServicos";
 import { ConquistaUsuario, GrupoAtividades, UsuarioGeral, Atividades, Exercicios } from "../../interfaces/UsuarioGeral";
 
-/**
- * Tela principal do paciente
- * 
- * Mostra as conquistas do paciente, suas atividades em andamento e permite que ele tire suas dúvidas ou agende conosco
- * 
- * @param {object} navigation Navega o entre as telas
- */
+
 export default function PrincipalPaciente({ navigation }) {
 
     const [dadosUsuario, setDadosUsuario] = useState({} as UsuarioGeral);
@@ -42,6 +36,8 @@ export default function PrincipalPaciente({ navigation }) {
         }
 
         const resultado = await pegarDadosUsuario(usuarioID, token);
+        //console.log(resultado);
+        
          
 
         if(resultado){
@@ -88,6 +84,7 @@ return (
         {carregado && (
           <View
             style={{
+              width: '90%',
               marginTop: '5%',
               alignSelf: 'center',
               paddingTop: '2%',
@@ -108,7 +105,7 @@ return (
               flex={1}
               borderWidth={1}
               borderRadius={10}
-              maxWidth='90%'
+              width='100%' // Adicione essa propriedade
               flexWrap='wrap'
               style={{ marginBottom: 0 }}
             >
@@ -128,7 +125,9 @@ return (
           <AtividadeCard 
           dadosAtividades={dadosAtividades} 
           listaAtividades={listaAtividades} 
-          titulo='Objetivo do dia' />
+          titulo='Objetivo do dia'
+          
+          />
         )}
         
         {carregado && (

@@ -1,3 +1,5 @@
+
+
 export interface UsuarioCadastro {
         email: string;
         nome: string;
@@ -10,10 +12,18 @@ export interface UsuarioCadastro {
          profissional: profissional[];
          validade: string;
          moeda: number;
-         nivel: number 
+         nivel: number;
+         conquistas?: ConquistaUsuario[]; 
     
            
 }
+
+export interface ConquistaUsuario {
+    nome: string,
+    imagem: string,
+    descricao: string,
+    condicao: number
+  }
 
 export interface profissional{
     idDoProfissional: string;
