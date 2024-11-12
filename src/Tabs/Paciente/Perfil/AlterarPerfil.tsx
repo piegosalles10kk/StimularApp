@@ -2,11 +2,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, Alert, Modal, StyleSheet, Text } from 'react-native';
 import { ScrollView, VStack, Avatar, HStack } from 'native-base';
-import { avatares } from '../../utils/Avatares';
-import { UsuarioGeral } from '../../interfaces/UsuarioGeral';
-import { EntradaTexto } from '../../componentes/EntradaTexto';
-import { Botao } from '../../componentes/Botao';
-import { pegarDadosUsuario, atualizarPaciente } from '../../servicos/PacienteServico';
+import { avatares } from '../../../utils/Avatares';
+import { UsuarioGeral } from '../../../interfaces/UsuarioGeral';
+import { EntradaTexto } from '../../../componentes/EntradaTexto';
+import { Botao } from '../../../componentes/Botao';
+import { pegarDadosUsuario, atualizarPaciente } from '../../../servicos/PacienteServico';
 
 const DismissKeyboard = ({ children }) => (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>

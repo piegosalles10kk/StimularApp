@@ -1,19 +1,20 @@
-import { ImagemLogo } from "../../componentes/ImagemLogo";
+import { ImagemLogo } from "../../../componentes/ImagemLogo";
 import { VStack, ScrollView, HStack, Box, Pressable } from "native-base";
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { Titulo } from "../../componentes/Titulo";
+import { Titulo } from "../../../componentes/Titulo";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from 'react-native';
+import {  GrupoAtividades, UsuarioGeral, Atividades, GruposDeAtividadesFinalizadas } from "../../../interfaces/UsuarioGeral";
+import AtividadeCard from "../../../componentes/GrupoAtividadeCard";
+import Graficos from "../../../componentes/Graficos";
 
 // Api
-import { pegarDadosUsuario } from "../../servicos/PacienteServico";
-import { pegarGruposAtividadesNivel } from "../../servicos/GrupoAtividadesServicos";
-import { ConquistaUsuario, GrupoAtividades, UsuarioGeral, Atividades, Exercicios, GruposDeAtividadesFinalizadas } from "../../interfaces/UsuarioGeral";
-import AtividadeCard from "../../componentes/GrupoAtividadeCard";
-import Graficos from "../../componentes/Graficos";
+import { pegarDadosUsuario } from "../../../servicos/PacienteServico";
+import { pegarGruposAtividadesNivel } from "../../../servicos/GrupoAtividadesServicos";
 
-export default function AtividadesPaciente() {
+
+export default function AtividadesPaciente( { navigation } ) {
     const listaCategorias = [
         { id: 1, nome: 'Física', icone: 'body', busca: 'Física' },
         { id: 2, nome: 'Linguística', icone: 'chatbubbles', busca: 'Linguistica' },
@@ -41,7 +42,7 @@ export default function AtividadesPaciente() {
                 ? prev.filter(item => item !== busca) // Remove se já estiver selecionado
                 : [...prev, busca]; // Adiciona se não estiver selecionado
     
-            console.log('Categorias selecionadas:', newCategorias);
+            //console.log('Categorias selecionadas:', newCategorias);
     
             // Chama a função para atualizar dadosAtividades com as novas categorias
             atualizarDadosAtividades(newCategorias); // Passa o novo array de categorias
@@ -63,7 +64,7 @@ export default function AtividadesPaciente() {
     
         const nivel = dadosUsuario.user.nivel;
         const grupo = dadosUsuario.user.grupo;
-        console.log(nivel, grupo, novasCategoriasSelecionadas); // Usar as novas categorias
+        //console.log(nivel, grupo, novasCategoriasSelecionadas); // Usar as novas categorias
     
         // Log dos dados que serão enviados para a API
         console.log('Enviando dados para a rota:', {
@@ -77,7 +78,7 @@ export default function AtividadesPaciente() {
             const resultadoAtividade = await pegarGruposAtividadesNivel(token, nivel, grupo, novasCategoriasSelecionadas);
     
             // Log do resultado da atividade recebida
-            console.log('Atividades recebidas:', resultadoAtividade);
+            //console.log('Atividades recebidas:', resultadoAtividade);
     
             // Atualiza os estados relacionados a atividades
             setDadosAtividades(resultadoAtividade);
@@ -119,12 +120,12 @@ export default function AtividadesPaciente() {
                 setDadosUsuario(resultado);
     
                 // Log dos dados do usuário e atividades antes de fazer a requisição
-                console.log('Dados do usuário recebidos:', resultado);
+                //console.log('Dados do usuário recebidos:', resultado);
     
                 const resultadoAtividade = await pegarGruposAtividadesNivel(token, resultado.user.nivel, resultado.user.grupo, categoriasSelecionadas);
     
                 // Log do resultado da atividade antes de armazená-la
-                console.log('Atividades recebidas:', resultadoAtividade);
+                //console.log('Atividades recebidas:', resultadoAtividade);
         
                 // Extraindo os dados desejados
                 const dataFinalizadasTemp = (Object.values(resultado.user.gruposDeAtividadesFinalizadas).map((atividade: GruposDeAtividadesFinalizadas) => atividade.dataFinalizada));
@@ -233,6 +234,15 @@ export default function AtividadesPaciente() {
                             dadosAtividades={dadosAtividades}
                             listaAtividades={listaAtividades}
                             titulo='Atividade recomendada'
+                            onPressAtividade={() => {
+                                const grupoAtividadesId = dadosAtividades.atividades[0]._id; 
+                                console.log(grupoAtividadesId);
+                                navigation.navigate('GrupoAtividadesTela', { id: grupoAtividadesId });       
+                            }}
+                            onPressExercicio={(atividadeId) => {
+                                console.log('Atividade ID:', atividadeId);
+                                navigation.navigate('ExercicioTela', { id: atividadeId });       
+                            }}
                         />
                     )}
                 </VStack>

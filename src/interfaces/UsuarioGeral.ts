@@ -13,17 +13,19 @@ export interface Alternativas {
   }
   
   export interface Atividades {
-    atividades:{
+    [x: string]: any;
+  
     nomdeDaAtividade: string;
     fotoDaAtividade: string;
     tipoDeAtividade: string;
     exercicios: Exercicios[];
     pontuacaoTotalAtividade: number;
-  }
+  
   }
   
   export interface GrupoAtividades {
-    atividades:
+    [x: string]: any;
+    grupoAtividades:
     {filter(arg0: (grupo: any) => boolean): unknown; 
     nomeGrupo: string;
     nivelDaAtividade: number;

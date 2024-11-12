@@ -27,7 +27,7 @@ const CardAtividade = ({
       borderRadius={20}
       bg="white"
       shadow={2}
-      style={{ width: '100%', height: newHeight, ...containerStyle }} // Aplicando a nova altura e estilos personalizados
+      style={{ width: '90%', height: newHeight, ...containerStyle }} // Aplicando a nova altura e estilos personalizados
     >
       <Avatar
         source={{ uri: avatarUri }}
@@ -39,11 +39,13 @@ const CardAtividade = ({
         ml={2}
       />
       <VStack display="flex" flexDirection="column" flex={1} alignSelf="center">
-        <Titulo style={textStyle} fontWeight="bold" fontSize="lg" color="gray.600">
+        <Titulo style={textStyle} fontWeight="bold" fontSize='md' color="black">
           {titulo}
         </Titulo>
-        <Text style={textStyle} fontSize="xs">
+        <Text style={textStyle} fontSize="xs" alignSelf='center'>
           {descricao}
+        </Text>
+        <Text style={textStyle} fontSize="xs" alignSelf='center'>
         </Text>
       </VStack>
       <Button
@@ -51,9 +53,9 @@ const CardAtividade = ({
         leftIcon={<Icon name="play" size={24} color="white" />}
         style={{ width: 50, height: 50, ...buttonStyle }}
         mr={3}
-        bg="rosaEscuro"
+        bg="roxoClaro"
         borderRadius={15}
-        _pressed={{ bg: 'roxoClaro' }}
+        _pressed={{ bg: 'rosaEscuro' }}
         onPress={() => onPress(id)} // Use a função onPress passada como prop
       />
     </VStack>

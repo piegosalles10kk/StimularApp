@@ -6,8 +6,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Cadastro from "./Cadastro";
 import Login from "./Login";
 import Tabs from "./Tabs";
-import AlterarPerfil from "./Tabs/Paciente/AlterarPerfil";
+import AlterarPerfil from "./Tabs/Paciente/Perfil/AlterarPerfil";
 import GrupoAtividadesTela from "./Tabs/Paciente/Atividades/GrupoAtividadesTela";
+import ExercicioTela from "./Tabs/Paciente/Atividades/ExercicioTela";
 
 
 const Tab = createNativeStackNavigator();
@@ -43,6 +44,13 @@ export default function Rotas() {
                 <Tab.Screen 
                     name="GrupoAtividadesTela" 
                     component={GrupoAtividadesTela} 
+                    options={{ headerShown: false }}
+                    />
+                
+
+                <Tab.Screen 
+                    name="ExercicioTela" 
+                    component={ExercicioTela} 
                     options={{ headerShown: false }}
                     />
 

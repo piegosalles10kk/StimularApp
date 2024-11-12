@@ -1,16 +1,16 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TouchableOpacity } from 'react-native';
 import { VStack, View, ScrollView, Avatar, HStack, Modal, Image } from "native-base";
-import { Botao } from "../../componentes/Botao";
+import { Botao } from "../../../componentes/Botao";
 import { useEffect, useState } from "react";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 //Api
-import { pegarDadosUsuario } from "../../servicos/PacienteServico";
-import {  UsuarioGeral } from "../../interfaces/UsuarioGeral";
-import { Titulo } from "../../componentes/Titulo";
-import { diagnosticos } from "../../utils/Diagnosticos";
-import EditableModal from "../../componentes/BotaoModal";
+import { pegarDadosUsuario } from "../../../servicos/PacienteServico";
+import {  UsuarioGeral } from "../../../interfaces/UsuarioGeral";
+import { Titulo } from "../../../componentes/Titulo";
+import { diagnosticos } from "../../../utils/Diagnosticos";
+import EditableModal from "../../../componentes/BotaoModal";
 
 
 export default function PerfilPaciente({ navigation }) {
@@ -130,7 +130,7 @@ useEffect(() => {
         return {
             anos: idadeAnos,
             meses: meses,
-            idadeEmMeses: idadeEmMeses as number // Adicionando também o total de meses
+            idadeEmMeses: idadeEmMeses as number 
         };
     }
     
@@ -140,8 +140,8 @@ useEffect(() => {
             <VStack alignItems='center' mt='-3%'>
             
             <VStack
-                maxHeight='30%' // adicionado
-                maxWidth='100%' // adicionado
+                maxHeight='30%' 
+                maxWidth='100%' 
             >
                 <HStack
                     mb='5%'
@@ -149,8 +149,8 @@ useEffect(() => {
                     justifyContent='space-between'
                     width='100%'
                     position='relative'
-                    maxHeight='90%' // adicionado
-                    maxWidth='100%' // adicionado
+                    maxHeight='90%' 
+                    maxWidth='100%' 
                     zIndex={1}>
                         {dadosUsuario?.user?.grupo?.map((grupo, index) => {
                             const diagnostico = diagnosticos.find(d => d.nome?.trim() === grupo.trim());
@@ -166,7 +166,7 @@ useEffect(() => {
                                     key={index}
                                     style={{
                                         flex: 1,
-                                        minWidth: 100, // Define uma largura mínima
+                                        minWidth: 100, 
                                         aspectRatio: 1,
                                         resizeMode: 'cover',
                                         

@@ -16,7 +16,7 @@ import { ConquistaUsuario, GrupoAtividades, UsuarioGeral, Atividades, Exercicios
 export default function PrincipalPaciente({ navigation }) {
 
     const [dadosUsuario, setDadosUsuario] = useState({} as UsuarioGeral);
-    const [dadosAtividades, setDadosAtividades ] = useState({} as GrupoAtividades);
+    const [dadosAtividades, setDadosAtividades ] = useState({} as GrupoAtividades );
     const [ listaAtividades, setListaAtividades ] = useState({} as Atividades);
         
     const [conquistasUsuario, setConquistasUsuarios] = useState({} as ConquistaUsuario) 
@@ -47,7 +47,7 @@ export default function PrincipalPaciente({ navigation }) {
             
             setDadosAtividades(resultadoAtividade);
             setConquistasUsuarios(resultado.user.conquistas);
-            //console.log(resultadoAtividade.atividades[0]);
+            //console.log(resultadoAtividade.atividades[0]._id);
 
             setListaAtividades(resultadoAtividade.atividades[0]);
             //console.log(listaAtividades);
@@ -106,7 +106,7 @@ return (
               borderWidth={1}
               borderRadius={10}
               width='100%' // Adicione essa propriedade
-              flexWrap='wrap'
+              flexWrap='wrap'             
               style={{ marginBottom: 0 }}
             >
               {Object.values(conquistasUsuario).slice(Math.max(0, Object.values(conquistasUsuario)?.length - 3)).map((conquista?) => (
@@ -126,7 +126,15 @@ return (
           dadosAtividades={dadosAtividades} 
           listaAtividades={listaAtividades} 
           titulo='Objetivo do dia'
-          
+          onPressAtividade={() => {
+            const grupoAtividadesId = dadosAtividades.atividades[0]._id; 
+            console.log(grupoAtividadesId);
+            navigation.navigate('GrupoAtividadesTela', { id: grupoAtividadesId });       
+        }}
+          onPressExercicio={(atividadeId) => {
+            console.log('Atividade ID:', atividadeId);
+            navigation.navigate('ExercicioTela', { id: atividadeId });       
+        }}
           />
         )}
         

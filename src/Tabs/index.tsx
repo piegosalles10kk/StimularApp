@@ -6,11 +6,11 @@ import PrincipalPaciente from './Paciente/PrincipalPaciente';
 import PrincipalProfissional from './Profissional/PrincipalProfissional';
 import PrincipalAdmin from './Admin/PrincipalAdmin';
 
-import AtividadesPaciente from './Paciente/AtividadesPaciente';
+import AtividadesPaciente from './Paciente/Atividades/AtividadesPaciente';
 import AtividadesProfissional from './Profissional/AtividadesProfissional';
 import AtividadesAdmin from './Admin/AtividadesAdmin';
 
-import PerfilPaciente from './Paciente/PerfilPaciente';
+import PerfilPaciente from './Paciente/Perfil/PerfilPaciente';
 import PerfilProfissional from './Profissional/PerfilProfissional';
 import PerfilAdmin from './Admin/PerfilAdmin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
