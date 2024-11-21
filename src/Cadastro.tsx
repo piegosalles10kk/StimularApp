@@ -16,8 +16,7 @@ const DismissKeyboard = ({ children }) => (
     </TouchableWithoutFeedback>
 );
 
-export default function Cadastro() {
-    const navigation = useNavigation(); // Hook para navegação
+export default function Cadastro( navigation) {
     const [numSecao, setNumSecao] = useState(0);
     const [dados, setDados] = useState({} as any);
 
@@ -56,7 +55,7 @@ export default function Cadastro() {
           senha: dados.senha,
           confirmarSenha: dados.confirmarSenha,
           tipoDeConta: 'Paciente',
-          foto: 'https://stimular.com.br/wp-content/uploads/2024/05/Group-43837.png',
+          foto: 'https://stimularmidias.blob.core.windows.net/midias/6c0ab0a4-110f-4ce5-88c3-9c39ee10dba6.jpg',
           profissional: [
               {
                   idDoProfissional: "672243e4effa46003373d4f4",
@@ -68,7 +67,7 @@ export default function Cadastro() {
           nivel: 1,
           conquistas: [{
               nome: "Bem vindo!",
-              imagem: "https://stimular.com.br/wp-content/uploads/2024/05/Group-43837.png",
+              imagem: "https://stimularmidias.blob.core.windows.net/midias/6c0ab0a4-110f-4ce5-88c3-9c39ee10dba6.jpg",
               descricao: "Concluiu o cadastro",
               condicao: 0
           }]

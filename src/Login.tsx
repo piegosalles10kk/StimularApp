@@ -27,37 +27,59 @@ useEffect(() => {
   async function verificarLogin(){
     const token = await AsyncStorage.getItem('token');
     if (token){
-      navigation.replace('Tabs');
+      const tokenDecodificado = jwtDecode(token) as any;
+      const grupoDoUser = tokenDecodificado.grupo; 
+
+      if (Array.isArray(grupoDoUser) && grupoDoUser.length > 0) {
+        console.log('Navegando para Tabs');
+        navigation.replace('Tabs');
+      } else {
+        console.log('Navegando para Outra Tela');
+        navigation.replace('CadastroGrupo');
       }
-      setCarregando(false);
     }
+    setCarregando(false);
+  }
   verificarLogin();
-}, [])
+}, []);
 
 async function login(){
   const resultado = await fazerLogin(email, senha);
 
-  if (resultado){
-    const { token } = resultado
+  if (resultado) {
+    const { token } = resultado;
     AsyncStorage.setItem('token', token);
 
-    const tokenDecodificado = jwtDecode(token) as any
+    const tokenDecodificado = jwtDecode(token) as any;
     const id = tokenDecodificado.id;
-    const tipoDeConta = tokenDecodificado.tipoDeConta;    
+    const tipoDeConta = tokenDecodificado.tipoDeConta;
+    const grupoDoUser = tokenDecodificado.grupo; 
+
+    console.log('Token Decodificado:', tokenDecodificado);
+    console.log('ID:', id);
+    console.log('Tipo de Conta:', tipoDeConta);
+    console.log('Grupo do User:', grupoDoUser);
 
     AsyncStorage.setItem('id', id);
     AsyncStorage.setItem('tipoDeConta', tipoDeConta);
+    AsyncStorage.setItem('grupoDoUser', JSON.stringify(grupoDoUser));
 
-    navigation.replace('Tabs');
-  }else{
-     Alert.alert('Alerta', 'Email ou senha inválidos');
-     toast.show({
-      title: "Erro ao fazer login",
-      description: "Email ou senha incorretos",
-      backgroundColor: "roxoClaro",
-      
-    })
-  }
+    if (Array.isArray(grupoDoUser) && grupoDoUser.length > 0) {
+        console.log('Navegando para Tabs');
+        navigation.replace('Tabs');
+    } else {
+        console.log('Navegando para Outra Tela');
+        navigation.replace('CadastroGrupo');
+    }
+} else {
+    Alert.alert('Alerta', 'Email ou senha inválidos');
+    toast.show({
+        title: "Erro ao fazer login",
+        description: "Email ou senha incorretos",
+        backgroundColor: "roxoClaro",
+    });
+}
+
 }
 if (carregando){
   return null

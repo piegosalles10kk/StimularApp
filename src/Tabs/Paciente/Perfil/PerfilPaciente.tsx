@@ -11,6 +11,7 @@ import {  UsuarioGeral } from "../../../interfaces/UsuarioGeral";
 import { Titulo } from "../../../componentes/Titulo";
 import { diagnosticos } from "../../../utils/Diagnosticos";
 import EditableModal from "../../../componentes/BotaoModal";
+import { tokenMidia } from "../../../utils/token";
 
 
 export default function PerfilPaciente({ navigation }) {
@@ -180,7 +181,7 @@ useEffect(() => {
                                 })}
     
                     <Avatar
-                        source={{ uri: dadosUsuario?.user?.foto }}
+                        source={{ uri: `${dadosUsuario?.user?.foto}${tokenMidia}` }}
                         style={{ width: 180, height: 180 }}
                         position='absolute'
                         top='50%'

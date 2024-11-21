@@ -2,6 +2,7 @@ import React from 'react';
 import { VStack, HStack, Avatar, ScrollView, Image } from 'native-base';
 import { TouchableOpacity } from 'react-native';
 import { Titulo } from './Titulo';
+import { tokenMidia } from '../utils/token';
 
 // Definindo a interface das Props
 interface Props {
@@ -39,7 +40,7 @@ const AtividadeCard: React.FC<Props> = ({ dadosAtividades, listaAtividades, titu
                         <Avatar
                             size='xl'
                             borderWidth='1'
-                            source={{ uri: dadosAtividades?.atividades[0]?.imagem }}
+                            source={{ uri: `${dadosAtividades?.atividades[0]?.imagem}${tokenMidia}` }}
                         />
                         <VStack flexDirection='column' flexShrink={1}>
                             <Titulo color='black' bold fontSize='md'>
@@ -71,7 +72,7 @@ const AtividadeCard: React.FC<Props> = ({ dadosAtividades, listaAtividades, titu
                                         size='md'
                                         mr='2%'
                                         borderWidth='1'
-                                        source={{ uri: atividade.fotoDaAtividade }}
+                                        source={{ uri: `${atividade.fotoDaAtividade}${tokenMidia}` }}
                                     />
                                     <VStack flexDirection='column' alignItems='center'>
                                         <Titulo fontSize='sm' bold color='black'>

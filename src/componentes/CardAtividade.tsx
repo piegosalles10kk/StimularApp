@@ -2,6 +2,7 @@ import React from 'react';
 import { VStack, Text, Button, Avatar } from 'native-base';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Titulo } from './Titulo';
+import { tokenMidia } from '../utils/token';
 
 const CardAtividade = ({
   titulo,
@@ -27,10 +28,10 @@ const CardAtividade = ({
       borderRadius={20}
       bg="white"
       shadow={2}
-      style={{ width: '90%', height: newHeight, ...containerStyle }} // Aplicando a nova altura e estilos personalizados
+      style={{ width: '90%', height: newHeight, ...containerStyle }}
     >
       <Avatar
-        source={{ uri: avatarUri }}
+        source={{ uri: `${avatarUri}${tokenMidia}` }}
         style={{ width: 80, height: 80, ...avatarStyle }}
         borderColor="black"
         borderWidth="2"
@@ -56,7 +57,7 @@ const CardAtividade = ({
         bg="roxoClaro"
         borderRadius={15}
         _pressed={{ bg: 'rosaEscuro' }}
-        onPress={() => onPress(id)} // Use a função onPress passada como prop
+        onPress={() => onPress(id)}
       />
     </VStack>
   );

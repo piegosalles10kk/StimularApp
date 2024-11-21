@@ -7,6 +7,7 @@ import { UsuarioGeral } from '../../../interfaces/UsuarioGeral';
 import { EntradaTexto } from '../../../componentes/EntradaTexto';
 import { Botao } from '../../../componentes/Botao';
 import { pegarDadosUsuario, atualizarPaciente } from '../../../servicos/PacienteServico';
+import { tokenMidia } from '../../../utils/token';
 
 const DismissKeyboard = ({ children }) => (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -97,7 +98,7 @@ const AlterarPerfil = ({ navigation }) => {
                     <VStack alignItems='center' mt='10%'>
                     {carregado && (
                         <TouchableWithoutFeedback onPress={() => setShowModal(true)}>
-                            <Avatar size='200' borderWidth='2' shadow='5' source={{ uri: selectedAvatar || dados.foto }} />                        
+                            <Avatar size='200' borderWidth='2' shadow='5' source={{ uri: selectedAvatar ? `${selectedAvatar}${tokenMidia}` : `${dados.foto}${tokenMidia}` }} />                        
                         </TouchableWithoutFeedback>
                     )}
 
@@ -129,7 +130,7 @@ const AlterarPerfil = ({ navigation }) => {
                                                     setSelectedAvatar(avatar.imagemAvatar);
                                                     setShowModal(false);
                                                 }}>
-                                                    <Avatar size='71' source={{ uri: avatar.imagemAvatar }} style={styles.avatar} />
+                                                    <Avatar size='71' source={{ uri: `${avatar.imagemAvatar}${tokenMidia}` }} style={styles.avatar} />
                                                 </TouchableWithoutFeedback>
                                             ))}
                                         </HStack>

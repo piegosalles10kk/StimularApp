@@ -11,6 +11,7 @@ import { Botao } from "../../componentes/Botao";
 import { pegarDadosUsuario } from "../../servicos/PacienteServico";
 import { pegarGruposAtividadesNivel } from "../../servicos/GrupoAtividadesServicos";
 import { ConquistaUsuario, GrupoAtividades, UsuarioGeral, Atividades, Exercicios } from "../../interfaces/UsuarioGeral";
+import { tokenMidia } from "../../utils/token";
 
 
 export default function PrincipalPaciente({ navigation }) {
@@ -112,7 +113,7 @@ return (
               {Object.values(conquistasUsuario).slice(Math.max(0, Object.values(conquistasUsuario)?.length - 3)).map((conquista?) => (
                 <Conquista
                   key={conquista?._id}
-                  uri={conquista?.imagem}
+                  uri={`${conquista?.imagem}${tokenMidia}`}
                   titulo={conquista?.nome}
                   avatarStyle={{ borderWidth: 1, borderColor: 'black' }}
                 />

@@ -9,6 +9,7 @@ import Tabs from "./Tabs";
 import AlterarPerfil from "./Tabs/Paciente/Perfil/AlterarPerfil";
 import GrupoAtividadesTela from "./Tabs/Paciente/Atividades/GrupoAtividadesTela";
 import ExercicioTela from "./Tabs/Paciente/Atividades/ExercicioTela";
+import CadastroGrupo from "./CadastroGrupo";
 
 
 const Tab = createNativeStackNavigator();
@@ -51,6 +52,12 @@ export default function Rotas() {
                 <Tab.Screen 
                     name="ExercicioTela" 
                     component={ExercicioTela} 
+                    options={{ headerShown: false }}
+                    />
+
+                <Tab.Screen 
+                    name="CadastroGrupo" 
+                    component={CadastroGrupo} 
                     options={{ headerShown: false }}
                     />
 

@@ -17,6 +17,7 @@ import { pegarGruposAtividadesPorId } from "../../../servicos/GrupoAtividadesSer
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CardAtividade from "../../../componentes/CardAtividade";
+import { tokenMidia } from "../../../utils/token";
 
 export default function GrupoAtividadesTela({ navigation }) {
 
@@ -151,7 +152,7 @@ export default function GrupoAtividadesTela({ navigation }) {
                                 })}
     
                     <Image
-                        source={{ uri: dadosAtividades.grupoAtividades.imagem }}
+                        source={{ uri: `${dadosAtividades.grupoAtividades.imagem}${tokenMidia}` }}
                         style={{ width: 180, height: 180 }}
                         position='absolute'
                         top='50%'
