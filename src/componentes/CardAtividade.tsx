@@ -12,8 +12,8 @@ const CardAtividade = ({
   avatarStyle = {},
   buttonStyle = {},
   textStyle = {},
-  onPress, // Adicione a prop onPress
-  id  // Adicione a prop id
+  onPress,
+  id 
 }) => {
   // Suponha que a altura original seja calculada ou conhecida
   const originalHeight = 100; // Exemplo de altura original

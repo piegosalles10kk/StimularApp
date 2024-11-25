@@ -153,6 +153,7 @@ export default function GrupoAtividadesTela({ navigation }) {
     
                     <Image
                         source={{ uri: `${dadosAtividades.grupoAtividades.imagem}${tokenMidia}` }}
+                        alt="Tela"
                         style={{ width: 180, height: 180 }}
                         position='absolute'
                         top='50%'
@@ -180,7 +181,7 @@ export default function GrupoAtividadesTela({ navigation }) {
                 avatarUri={atividade.fotoDaAtividade}
                 onPress={() => { 
                     console.log('Atividade ID:', atividade._id);
-                    navigation.navigate('ExercicioTela', { id: atividade._id });
+                    navigation.navigate('ExercicioTela', { atividadeId: atividade._id, idGrupoAtividades: id });
                 }}
                 id={atividade._id}
             />

@@ -240,8 +240,9 @@ export default function AtividadesPaciente( { navigation } ) {
                                 navigation.navigate('GrupoAtividadesTela', { id: grupoAtividadesId });       
                             }}
                             onPressExercicio={(atividadeId) => {
+                                const grupoAtividadesId = dadosAtividades.atividades[0]._id; 
                                 console.log('Atividade ID:', atividadeId);
-                                navigation.navigate('ExercicioTela', { id: atividadeId });       
+                                navigation.navigate('ExercicioTela', { atividadeId: atividadeId, idGrupoAtividades: grupoAtividadesId });      
                             }}
                         />
                     )}

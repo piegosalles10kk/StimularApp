@@ -1,11 +1,16 @@
 export interface Alternativas {
+    map(arg0: (alternativa: any, index: any) => import("react").JSX.Element): any;
+    _id: string;
     alternativa: string;
     resultadoAlternativa: boolean;
   }
   
   export interface Exercicios {
     exercicioId: string;
-    midia: string;
+    midia: {
+      tipoDeMidia: string;
+      url: string;
+    };
     enunciado: string;
     exercicio: string;
     alternativas: Alternativas[];
@@ -40,11 +45,15 @@ export interface Alternativas {
     pontuacaoTotalDoGrupo: number;}}
   
   export interface GruposDeAtividadesEmAndamento {
+    _id: string;
     grupoAtividadesId: string;
     dataInicio: Date;
+    pontuacaoPossivel: number;
     respostas: {
       exercicioId: string;
+      atividade_id: string,
       isCorreta: boolean;
+      pontuacao: number;
     }[];
   }
   
