@@ -11,7 +11,10 @@ export interface UsuarioCadastro {
          foto: string;
          profissional: profissional[];
          validade: string;
-         moeda: number;
+         moeda: {
+          valor: number,
+          dataDeCriacao: Date
+         };
          nivel: number;
          conquistas?: ConquistaUsuario[]; 
     

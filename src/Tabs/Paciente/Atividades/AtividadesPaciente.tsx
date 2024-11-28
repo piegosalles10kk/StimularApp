@@ -10,13 +10,14 @@ import AtividadeCard from "../../../componentes/GrupoAtividadeCard";
 import Graficos from "../../../componentes/Graficos";
 
 // Api
-import { pegarDadosUsuario } from "../../../servicos/PacienteServico";
-import { pegarGruposAtividadesNivel } from "../../../servicos/GrupoAtividadesServicos";
+import { pegarDadosUsuario, updateMoeda } from "../../../servicos/PacienteServico";
+import { pegarGruposAtividadesNivel, postarAtividadeEmAndamento } from "../../../servicos/GrupoAtividadesServicos";
+import ModalTemplate from "../../../componentes/Modal";
 
 
 export default function AtividadesPaciente( { navigation } ) {
     const listaCategorias = [
-        { id: 1, nome: 'Física', icone: 'body', busca: 'Física' },
+        { id: 1, nome: 'Física', icone: 'body', busca: 'Fisica' },
         { id: 2, nome: 'Linguística', icone: 'chatbubbles', busca: 'Linguistica' },
         { id: 3, nome: 'Cognitiva', icone: 'extension-puzzle', busca: 'Cognitiva' },
         { id: 4, nome: 'Socioafetiva', icone: 'happy', busca: 'socioafetiva' },
@@ -30,6 +31,13 @@ export default function AtividadesPaciente( { navigation } ) {
     const [listaAtividades, setListaAtividades] = useState({} as Atividades);
     const [carregadoGrafico, setCarregandoGrafico] = useState(false);
     const [carregado, setCarregando] = useState(false);
+
+    
+    const [modalVisible1, setModalVisible1] = useState(false);
+
+    const [modalVisible2, setModalVisible2] = useState(false);
+
+    const [ atividadeId, setAtividadeId ] = useState('');
 
     const handleCategoriaClick = async (busca: string) => {
         console.log(`Categoria clicada: ${busca}`); // Log de validação
@@ -49,6 +57,67 @@ export default function AtividadesPaciente( { navigation } ) {
             return newCategorias;
         });
     };
+
+    
+    //Logica de moeda
+
+    const handleOpenModal = (atividadeIdParam) => {
+        setAtividadeId(atividadeIdParam);
+        const grupoAtividadesId = dadosAtividades.atividades[0]._id;
+    
+        console.log(dadosAtividades.atividades[0]._id);
+    
+        // Verifica se o array de grupos de atividades em andamento não está vazio
+        if (dadosUsuario.user.gruposDeAtividadesEmAndamento.length > 0) {
+            // Agora verificamos o grupoAtividadesId do primeiro elemento do array
+            const atividadeEmAndamento = dadosUsuario.user.gruposDeAtividadesEmAndamento[0];
+            
+            if (atividadeEmAndamento.grupoAtividadesId === grupoAtividadesId) {
+                navigation.navigate('ExercicioTela', { atividadeId: atividadeId, idGrupoAtividades: grupoAtividadesId });
+            } else {
+                setModalVisible1(true);
+            }
+        } else {
+            console.warn('Nenhuma atividade em andamento encontrada.');
+            setModalVisible1(true);  // Mostramos o modal se não houver atividades em andamento
+        }
+    };
+    
+    const tornarBotaoVisivel = async () => {
+        const grupoAtividadesId = dadosAtividades.atividades[0]._id;
+    
+        if (dadosUsuario.user.moeda.valor > 0) {
+            await atualizarMoeda();
+            console.log('Atividade ID:', atividadeId);
+            navigation.navigate('ExercicioTela', { atividadeId: atividadeId, idGrupoAtividades: grupoAtividadesId });
+        } else {
+            setModalVisible2(true);
+        }
+    };
+    
+      const atualizarMoeda = async () => {
+          try {
+              const usuarioID = await AsyncStorage.getItem('id');
+              const token = await AsyncStorage.getItem('token');
+    
+              console.log(`UsuarioID: ${usuarioID}, Token: ${token}`);
+    
+              if (dadosUsuario.user.moeda.valor >= 1) {
+                  const resultado = await updateMoeda(usuarioID, token, { moeda: { valor: dadosUsuario.user.moeda.valor - 1 } });
+                  console.log('Moeda atualizada para:', dadosUsuario.user.moeda.valor - 1);
+                   
+                  const enviarAtividadeEmAndamento = await postarAtividadeEmAndamento(dadosAtividades.atividades[0]._id, token);
+                  console.log('Atividade enviada:', enviarAtividadeEmAndamento);
+                  
+
+              } else {
+                  setModalVisible2(true)
+                  
+              }
+          } catch (error) {
+              console.error('Erro ao acessar AsyncStorage:', error);
+          }
+      };
     
     const atualizarDadosAtividades = async (novasCategoriasSelecionadas) => {
         const [usuarioID, token] = await Promise.all([
@@ -230,6 +299,25 @@ export default function AtividadesPaciente( { navigation } ) {
 
                 <VStack width='90%' mt='5%'>
                     {carregado && (
+            
+                        <VStack>
+
+                            <ModalTemplate
+                                bodyText="Ao clicar em continuar voce irá iniciar a atividade. Tem certeza que deseja continuar?" 
+                                confirmButtonText="Continuar"
+                                onConfirm={tornarBotaoVisivel}
+                                isVisible = {modalVisible1}
+                                onClose={() => setModalVisible1(false)}
+                                                                    
+                                                />
+
+                            <ModalTemplate
+                                bodyText="Você já realizou suas atividades do dia, volte amanha para mais!"
+                                confirmButtonText="Voltar"
+                                isVisible = {modalVisible2}
+                                onClose={() => setModalVisible2(false)}
+                                                />
+
                         <AtividadeCard
                             dadosAtividades={dadosAtividades}
                             listaAtividades={listaAtividades}
@@ -240,11 +328,10 @@ export default function AtividadesPaciente( { navigation } ) {
                                 navigation.navigate('GrupoAtividadesTela', { id: grupoAtividadesId });       
                             }}
                             onPressExercicio={(atividadeId) => {
-                                const grupoAtividadesId = dadosAtividades.atividades[0]._id; 
-                                console.log('Atividade ID:', atividadeId);
-                                navigation.navigate('ExercicioTela', { atividadeId: atividadeId, idGrupoAtividades: grupoAtividadesId });      
+                                handleOpenModal(atividadeId)       
                             }}
                         />
+                        </VStack>
                     )}
                 </VStack>
 

@@ -38,14 +38,19 @@ export default function Cadastro( navigation) {
         setDados({ ...dados, [id]: valor });
     }
 
+ 
+
     async function cadastrar() {
-      const hoje = new Date();
-      hoje.setDate(hoje.getDate() + 7);
-  
-      const dia = String(hoje.getDate()).padStart(2, '0');
-      const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-      const ano = hoje.getFullYear();
-      const validade = `${dia}/${mes}/${ano}`;
+        const hoje = new Date();
+        const dia = String(hoje.getDate()).padStart(2, '0');
+        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+        const ano = hoje.getFullYear();
+
+        const dataHoje = `${dia}/${mes}/${ano}`;
+
+        hoje.setDate(hoje.getDate() + 7);
+
+        const validade = `${dia}/${mes}/${ano}`;
   
       const resultado = await cadastrarPaciente({
           email: dados.email,
@@ -63,7 +68,10 @@ export default function Cadastro( navigation) {
               }
           ],
           validade: validade,
-          moeda: 1,
+          moeda: {
+              valor: 1,
+              dataDeCriacao: new Date()
+          },
           nivel: 1,
           conquistas: [{
               nome: "Bem vindo!",
@@ -76,7 +84,7 @@ export default function Cadastro( navigation) {
       if (resultado) {
           // Alerta de sucesso e navegação
           Alert.alert('Sucesso', 'Paciente cadastrado com sucesso!', [
-              { text: 'OK', onPress: () => navigation.navigate('Login') } // Alternativa ao replace
+              { text: 'OK', onPress: () => navigation.replace('Login') } 
           ]);
       }
   }

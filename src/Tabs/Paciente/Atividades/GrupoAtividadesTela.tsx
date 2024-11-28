@@ -11,13 +11,15 @@ import { GrupoAtividades, UsuarioGeral, Atividades, GruposDeAtividadesFinalizada
 
 // Api
 
-import { pegarDadosUsuario } from "../../../servicos/PacienteServico";
+import { pegarDadosUsuario, updateMoeda } from "../../../servicos/PacienteServico";
 
-import { pegarGruposAtividadesPorId } from "../../../servicos/GrupoAtividadesServicos";
+import { pegarGruposAtividadesPorId, postarAtividadeEmAndamento } from "../../../servicos/GrupoAtividadesServicos";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CardAtividade from "../../../componentes/CardAtividade";
 import { tokenMidia } from "../../../utils/token";
+import { Botao } from "../../../componentes/Botao";
+import ModalTemplate from "../../../componentes/Modal";
 
 export default function GrupoAtividadesTela({ navigation }) {
 
@@ -28,6 +30,12 @@ export default function GrupoAtividadesTela({ navigation }) {
     const [ listaAtividades, setListaAtividades ] = useState({} as Atividades);
 
     const [carregado, setCarregando] = useState(false);
+
+    const [botaoVisivel, setBotaoVisivel] = useState(false);
+
+    const [modalVisible1, setModalVisible1] = useState(false);
+
+    const [modalVisible2, setModalVisible2] = useState(false);
 
     interface RouteParams {
 
@@ -40,68 +48,109 @@ export default function GrupoAtividadesTela({ navigation }) {
 
     const id = (route.params as RouteParams).id;
 
+    const handleOpenModal = () => {
+        setModalVisible1(true);
+    };
+
+    const tornarBotaoVisivel = async () => {
+        
+        if (dadosUsuario.user.moeda.valor > 0) {
+            await atualizarMoeda();
+
+
+            setBotaoVisivel(true);
+        } else {
+            setModalVisible2(true)
+        }
+    };
+
     
 
-    useEffect(() => {
-
-        async function dadosUsuario() {
-
+    const atualizarMoeda = async () => {
+        try {
             const usuarioID = await AsyncStorage.getItem('id');
-
-            if (!usuarioID) {
-
-                console.error('erro ao pegar o id do usuario');
-
-                return;
-
-            }
-
             const token = await AsyncStorage.getItem('token');
 
-            if (!token) {
+            console.log(`UsuarioID: ${usuarioID}, Token: ${token}`);
 
-                console.error('erro ao pegar o token');
-
-                return;
-
-            }    
-
-            const resultado = await pegarDadosUsuario(usuarioID, token);
-
-            if (resultado) {
-
-                setDadosUsuario(resultado);
-
-               
-
-                const resultadoAtividade = await pegarGruposAtividadesPorId(id, token);
-
-                //console.log('Atividades recebidas:', resultadoAtividade);
-
-                setDadosAtividades(resultadoAtividade);
-
-                setListaAtividades(resultadoAtividade.grupoAtividades.atividades);
+            if (dadosUsuario.user.moeda.valor >= 1) {
+                const resultado = await updateMoeda(usuarioID, token, { moeda: { valor: dadosUsuario.user.moeda.valor - 1 } });
+                console.log('Moeda atualizada para:', dadosUsuario.user.moeda.valor - 1);
+                const enviarAtividadeEmAndamento = await postarAtividadeEmAndamento(id, token);
+                console.log('Atividade enviada:', enviarAtividadeEmAndamento);
                 
-                //console.log(listaAtividades[0].nomdeDaAtividade);
-                
-
-                setCarregando(true);
-
             } else {
-
-                console.error("erro ao pegar os dados do usuario");
-
+                setModalVisible2(true)
+                
             }
-
+        } catch (error) {
+            console.error('Erro ao acessar AsyncStorage:', error);
         }
+    };
+        
 
-   
 
-        dadosUsuario(); // Carrega os dados no início da montagem do componente
+    useEffect(() => {
+        async function fetchDadosUsuario() {
+            try {
+                const usuarioID = await AsyncStorage.getItem('id');
+                if (!usuarioID) {
+                    console.error('Erro ao pegar o ID do usuário');
+                    return;
+                }
+    
+                const token = await AsyncStorage.getItem('token');
+                if (!token) {
+                    console.error('Erro ao pegar o token');
+                    return;
+                }
+    
+                const resultado = await pegarDadosUsuario(usuarioID, token);
+                if (resultado) {
+                    setDadosUsuario(resultado);
+                   // console.log('Dados do usuário:', resultado);
 
-    }, []
+                    const grupoAtividadeEmAndamento = resultado.user.gruposDeAtividadesEmAndamento[0];
+                    if (grupoAtividadeEmAndamento && grupoAtividadeEmAndamento.grupoAtividadesId === id) {
+                        setBotaoVisivel(true);
+                    }
+    
+                    const resultadoAtividade = await pegarGruposAtividadesPorId(id, token);
+                    if (resultadoAtividade) {
+                        setDadosAtividades(resultadoAtividade);
+                        setListaAtividades(resultadoAtividade.grupoAtividades.atividades || []);
+                    }
 
-    );
+                    setCarregando(true);
+                }
+            } catch (error) {
+                console.error("Erro ao carregar dados do usuário:", error);
+            }
+        }
+    
+        fetchDadosUsuario();
+    }, []);
+    
+    function verificarSeJaFezAtividade(idGrupoDoUsuario) {
+        const tempAtividadesUsuario = [];
+    
+        if (dadosUsuario.user.gruposDeAtividadesEmAndamento.length > 0) {
+            const tempGrupo = dadosUsuario.user.gruposDeAtividadesEmAndamento[0];
+    
+            // Verifique se respostas existem e são um array
+            if (tempGrupo.respostas && Array.isArray(tempGrupo.respostas)) {
+                for (let i = 0; i < tempGrupo.respostas.length; i++) {
+                    tempAtividadesUsuario.push(tempGrupo.respostas[i].atividade_id);
+                }
+            }
+        }
+    
+        const verificacao = !tempAtividadesUsuario.includes(idGrupoDoUsuario);
+        return verificacao;
+    }
+    
+    
+    
 
     return (
         <ScrollView showsVerticalScrollIndicator={false}>
@@ -170,22 +219,50 @@ export default function GrupoAtividadesTela({ navigation }) {
                         <Titulo color='black'bold >{dadosAtividades.grupoAtividades.nomeGrupo}</Titulo>
                         <Titulo fontSize='md' color='black' mb='4%'>{`Recomendado para: (${dadosAtividades.grupoAtividades.dominio})`}</Titulo>
                         <Titulo fontSize='md' textAlign='start' padding='2%'>{dadosAtividades.grupoAtividades.descricao}</Titulo>  
+
+                        
+                        {!botaoVisivel &&(
+                            <VStack alignItems='center'>
+                                <Botao onPress={handleOpenModal} >Iniciar atividade</Botao>
+                            <ModalTemplate
+                            bodyText="Ao clicar em continuar voce irá iniciar a atividade. Tem certeza que deseja continuar?" 
+                            confirmButtonText="Continuar"
+                            onConfirm={tornarBotaoVisivel}
+                            isVisible = {modalVisible1}
+                            onClose={() => setModalVisible1(false)}
+                                                 
+                            />
+
+                            <ModalTemplate
+                            bodyText="Você já realizou suas atividades do dia, volte amanha para mais!"
+                            confirmButtonText="Voltar"
+                            isVisible = {modalVisible2}
+                            onClose={() => setModalVisible2(false)}
+                            />
+                            </VStack>
+                        )}
+
+                        
                     </VStack>   
                     <Titulo mt='15%' bold color='black'>Exercicios</Titulo>
 
-                {listaAtividades.map((atividade, index) => (
+                    {listaAtividades.map((atividade, index) => (
+                        <VStack>                
+
                 <CardAtividade
-                key={index}
-                titulo={atividade.nomdeDaAtividade}
-                descricao={atividade.tipoDeAtividade}
-                avatarUri={atividade.fotoDaAtividade}
-                onPress={() => { 
-                    console.log('Atividade ID:', atividade._id);
-                    navigation.navigate('ExercicioTela', { atividadeId: atividade._id, idGrupoAtividades: id });
-                }}
-                id={atividade._id}
-            />
-                ))}
+                    key={atividade._id}
+                    titulo={atividade.nomdeDaAtividade}
+                    descricao={atividade.tipoDeAtividade}
+                    avatarUri={atividade.fotoDaAtividade}
+                    onPress={() => {
+                        console.log('Atividade ID:', atividade._id);
+                        navigation.navigate('ExercicioTela', { atividadeId: atividade._id, idGrupoAtividades: id });
+                    }}
+                    id={atividade._id}
+                    buttonVisible={ botaoVisivel && verificarSeJaFezAtividade(atividade._id) ? true : false}
+                />
+                </VStack>
+            ))}
 
                 </VStack>
                 

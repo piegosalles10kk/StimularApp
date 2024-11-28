@@ -9,6 +9,9 @@ import { ImagemLogo } from './componentes/ImagemLogo';
 import { fazerLogin } from './servicos/AutenticacaoServico';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
+import { GruposDeAtividadesEmAndamento, UsuarioGeral } from './interfaces/UsuarioGeral';
+import { pegarDadosUsuario, updateMoeda } from './servicos/PacienteServico';
+import { apagarAtividadeEmAndamento } from './servicos/GrupoAtividadesServicos';
 
 const DismissKeyboard = ({ children }) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -21,25 +24,108 @@ export default function Login({ navigation } : any) {
 const [email, setEmail] = useState('');
 const [senha, setSenha] = useState('');
 const [carregando, setCarregando] = useState(true);
+
 const toast = useToast();
 
-useEffect(() => {
-  async function verificarLogin(){
-    const token = await AsyncStorage.getItem('token');
-    if (token){
-      const tokenDecodificado = jwtDecode(token) as any;
-      const grupoDoUser = tokenDecodificado.grupo; 
 
-      if (Array.isArray(grupoDoUser) && grupoDoUser.length > 0) {
-        console.log('Navegando para Tabs');
-        navigation.replace('Tabs');
-      } else {
-        console.log('Navegando para Outra Tela');
-        navigation.replace('CadastroGrupo');
-      }
+function converterDataEmDiaMesAno(data) {
+  const dia = data.getDate();
+  const mes = data.getMonth() + 1;
+  const ano = data.getFullYear();
+  return `${dia}/${mes}/${ano}`;
+}
+
+useEffect(() => {
+  async function verificarLogin() {
+    const token = await AsyncStorage.getItem('token');
+    console.log('Token encontrado:', token); // Log do token
+
+    if (token) {
+        const tokenDecodificado = jwtDecode(token);
+        const grupoDoUser =  tokenDecodificado.grupo;
+
+        console.log('Grupo do usuário:', grupoDoUser); // Log do grupo
+
+        if (Array.isArray(grupoDoUser) && grupoDoUser.length > 0) {
+            console.log('Navegando para Tabs');
+            navigation.replace('Tabs');
+
+            const idUsuario = await AsyncStorage.getItem('id');
+            const tokenDecoded = await AsyncStorage.getItem('token');
+
+            const resultado = await pegarDadosUsuario(idUsuario, tokenDecoded);
+            console.log('Resultado do usuário:', resultado); // Log do resultado
+
+            const gruposDeAtividades = resultado.user.gruposDeAtividadesEmAndamento || []; // Default para array vazio
+            const dataDaMoeda = resultado.user.moeda.dataDeCriacao || null; // Se a data não existir, define como null
+            const valorQtdMoeda = resultado.user.moeda.valor || 0; // Se o valor não existir, considera 0
+
+            // Verificação se há atividades em andamento
+            if (gruposDeAtividades.length > 0) {
+                console.log('Data da atividade em andamento:', gruposDeAtividades[0]?.dataInicio);
+
+                const dataInicio = new Date(gruposDeAtividades[0].dataInicio);
+                if (!isNaN(dataInicio.getTime())) { // Verifica se é uma data válida
+                    const dataInicioDecoded = converterDataEmDiaMesAno(dataInicio);
+                    const dataAtualDecoded = converterDataEmDiaMesAno(new Date());
+                    const dataMoedaDecoded = dataDaMoeda ? converterDataEmDiaMesAno(new Date(dataDaMoeda)) : null;
+
+                    console.log('Data Inicial Decodificada:', dataInicioDecoded);
+                    console.log('Data Atual Decodificada:', dataAtualDecoded);
+                    if (dataMoedaDecoded) {
+                        console.log('Data Moeda Decodificada:', dataMoedaDecoded);
+                    }
+
+                    const verificacao1 = dataInicioDecoded < dataAtualDecoded; // Se a data da atividade é anterior à data atual
+
+                    console.log(`Data da atividade em andamento é menor que data atual: ${verificacao1}`);
+
+                    const idAtividadeDeOntem = gruposDeAtividades[0]._id;
+
+                    if (verificacao1) {
+                        const deletarAtividadeDeOntem = await apagarAtividadeEmAndamento(idAtividadeDeOntem, tokenDecoded);
+                        console.log('Atividade de ontem deletada:', deletarAtividadeDeOntem);
+                    }
+                } else {
+                    console.log('Data de início inválida:', gruposDeAtividades[0]?.dataInicio);
+                }
+            } else {
+                // Caso não haja atividades em andamento
+                console.log('Nenhuma atividade em andamento encontrada para o usuário.');
+            }
+
+            // Verificar se o usuário deve receber uma nova moeda
+            if (valorQtdMoeda < 1 && dataDaMoeda) {
+                const dataMoeda = new Date(dataDaMoeda);
+                const dataAtual = new Date(); // Data atual
+                const dataMoedaDecoded = converterDataEmDiaMesAno(dataMoeda);
+                const dataAtualDecoded = converterDataEmDiaMesAno(dataAtual);
+                
+                // Converte para comparação
+                const verificarMoeda = dataMoedaDecoded < dataAtualDecoded;
+
+                if (verificarMoeda) {
+                    const atualizarMoeda = await updateMoeda(idUsuario, token, {
+                        moeda: { valor: valorQtdMoeda + 1, dataDeCriacao: new Date() }
+                    });
+                    console.log('Moeda atualizada ao atender condições:', atualizarMoeda);
+                } else {
+                    console.log('Não é necessário atualizar a moeda, a data da moeda ainda é válida.');
+                }
+            }
+        } else {
+            console.log('Navegando para Outra Tela');
+            navigation.replace('CadastroGrupo');
+        }
+    } else {
+        console.log('Token não encontrado');
     }
+
     setCarregando(false);
-  }
+}
+
+
+    
   verificarLogin();
 }, []);
 

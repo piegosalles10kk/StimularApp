@@ -98,10 +98,14 @@ export interface Alternativas {
   
   export interface UsuarioGeral {
     user:{
+      _id: string;
         tipoDeConta: string;
         conquistas: ConquistaUsuario[];
         validade: string;
-        moeda: number;
+        moeda: {
+          valor: number,
+          dataDeCriacao: Date
+         };
         nivel: number;
         nome: string;
         email: string;

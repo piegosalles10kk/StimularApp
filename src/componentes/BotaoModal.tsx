@@ -45,9 +45,8 @@ const EditableModal: React.FC<Props> = ({
       mb='10%'
       >{botao}</Botao>
       <Modal isOpen={modalVisible} onClose={handleCloseModal}>
-        <Modal.Content>
-          <Modal.Body>
-            <Modal.Header alignSelf="center" fontWeight='bold'>🚨ATENÇÃO🚨</Modal.Header>
+        <Modal.Content maxWidth={'90%'}>
+          <Modal.Body >
             <Modal.Body alignSelf="center" >{bodyText}</Modal.Body>
             <Botao onPress={handleConfirm} alignSelf="center" mt='1%'>
               {confirmButtonText}

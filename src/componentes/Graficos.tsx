@@ -19,7 +19,7 @@ const Graficos = ({ labels, data, quantidade }) => {
     <View>
       <LineChart
         data={{
-          labels: recentLabels,
+          labels: [],
           datasets: [
             {
               data: recentData,

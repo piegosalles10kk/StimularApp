@@ -45,3 +45,22 @@ export async function atualizarPaciente(paciente: UsuarioCadastro, idDoPaciente:
     return null;
   }
 }
+
+export async function updateMoeda(userId: string, token: string, moeda: { moeda: { valor: number; dataDeCriacao?: Date } }) {
+  try {
+      console.log('Atualizando moeda para o usuário:', userId, 'com dados:', moeda); 
+
+      const resultado = await api.patch(`/users/${userId}/moeda`, moeda, {
+          headers: {
+              Authorization: `Bearer ${token}`,
+          },
+      });
+
+      console.log('Resposta da atualização:', resultado.data);
+      return resultado.data;
+
+  } catch (error) {
+      console.log('Erro ao atualizar moeda do usuário:', error.response ? error.response.data : error.message); // Mais detalhes sobre o erro
+      return null;
+  }
+}

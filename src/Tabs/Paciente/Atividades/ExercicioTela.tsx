@@ -9,6 +9,7 @@ import { pegarAtividadesPorId, pegarGruposAtividadesPorId, postarAtividadeEmAnda
 import { tokenMidia } from "../../../utils/token";
 import { Video, ResizeMode } from 'expo-av';
 import { Botao } from "../../../componentes/Botao";
+import ModalAtividade from "../../../componentes/modalAtividades";
 
 export default function ExercicioTela({ navigation }) {
 
@@ -34,6 +35,10 @@ export default function ExercicioTela({ navigation }) {
     const [exercicios, setExercicios] = useState([] as Exercicios[]);
 
     const [alternativas, setAlternativas] = useState([] as Alternativas[]);
+
+    const [modalVisible1, setModalAtividadeEmAndamento] = useState(false);
+
+    const [modalAtividadeFinalizada, setModalAtividadeFinalizada] = useState(false);
 
     const [selectedAlternative, setSelectedAlternative] = useState<{
 
@@ -108,6 +113,7 @@ export default function ExercicioTela({ navigation }) {
                     setExercicios(resultadoAtividade.atividade.exercicios);
 
                     setAlternativas(resultadoAtividade.atividade.exercicios[0].alternativas);
+                    
 
                                        
 
@@ -184,12 +190,11 @@ export default function ExercicioTela({ navigation }) {
 
     }, []);
 
+
+ 
+
+
     async function salvarAtividade() {
-        const hasAllItems = exerciciosDoGrupo.every((item) => {
-            return exerciciosDoUsuario.includes(item.trim());
-        });
-    
-        const allConditionsMet = hasAllItems && exerciciosDoUsuario.includes(idAtividade);
         const resolvedToken = await token;
     
         // Estrutura base das respostas
@@ -203,82 +208,85 @@ export default function ExercicioTela({ navigation }) {
     
         console.log("Resposta preparada:", resposta);
     
-        // Verificação se tudo está funcionando
-        if (!resposta.alternativaId || resposta.isCorreta === undefined || resposta.pontuacao === undefined) {
+        // Verificação de dados incompletos
+        if (!(resposta.alternativaId && resposta.isCorreta !== undefined && resposta.pontuacao !== undefined)) {
             console.error("Os dados da resposta estão incompletos:", resposta);
             return; // Saída da função para evitar chamada ao servidor
         }
     
         const atividadesEmAndamento = dadosUsuario.user.gruposDeAtividadesEmAndamento;
     
-        // Estrutura para a requisição de postagem
-        const postarAtividadeData = {
-            respostas: [
-                {
-                    atividade_id: resposta.atividade_id,
-                    exercicioId: resposta.exercicioId,
-                    alternativaId: resposta.alternativaId,
-                    isCorreta: resposta.isCorreta,
-                    pontuacao: resposta.pontuacao,
-                },
-            ],
-        };
+        // Criação de arrays temporários
+        const exerciciosTempGrupo = exerciciosDoGrupo.map(item => item.trim());
+        console.log(`exercicios do grupo: [${exerciciosTempGrupo}]`);
+        
+        const exerciciosTempUsuario = exerciciosDoUsuario;
     
-        // Estrutura para a requisição de atualização
-        const atualizarAtividadeData = {
-            alternativaId: resposta.alternativaId,
+        // Criação do array de verificação
+        const verificacao = [...exerciciosTempUsuario, idAtividade];
+        console.log(`essa é a verificação [${verificacao}]`);
+        
+
+        // Verifica se todos os exercícios do grupo estão presentes na verificação
+        const todosExerciciosCobertos = exerciciosTempGrupo.every(item => verificacao.includes(item));
+    
+        const temAtividadeAtual = verificacao.includes(idAtividade);
+        console.log(`tem a atividade atual? ${temAtividadeAtual}`);
+        console.log(`tem todos os exercicos? ${todosExerciciosCobertos}`);
+
+
+        // Dados para a requisição
+        const atividadeData = {
             atividade_id: resposta.atividade_id,
             exercicioId: resposta.exercicioId,
+            alternativaId: resposta.alternativaId,
             isCorreta: resposta.isCorreta,
             pontuacao: resposta.pontuacao,
         };
     
-        if (!atividadesEmAndamento || atividadesEmAndamento.length === 0) {
-            // Caso não haja atividades em andamento, enviar nova atividade
-            try {
-                const enviarAtividadeEmAndamento = await postarAtividadeEmAndamento(idGrupoAtividades, resolvedToken, postarAtividadeData.respostas);
-                if (enviarAtividadeEmAndamento) {
-                    console.log("Atividade em andamento enviada com sucesso:", enviarAtividadeEmAndamento);
-                } else {
-                    console.error("Erro ao enviar a atividade em andamento");
-                }
-            } catch (error) {
-                console.error("Erro ao postar atividade em andamento:", error.response ? error.response.data : error.message);
-            }
-        } else {
-            // Atualizar atividade em andamento
-            const idAtividadeEmAndamento = atividadesEmAndamento[0]._id;
-    
-            try {
-                const enviarAtividadeEmAndamento = await atualizarAtividadeEmAndamento(idAtividadeEmAndamento, resolvedToken, atualizarAtividadeData);
-                if (enviarAtividadeEmAndamento) {
-                    console.log("Atividade em andamento atualizada com sucesso:", enviarAtividadeEmAndamento);
-    
-                    // Se todas as condições foram atendidas, envia a atividade finalizada
-                    if (allConditionsMet) {
-                        const enviarAtividadeFinalizada = await postarAtividadeFinalizada(idGrupoAtividades, resolvedToken);
-                        if (enviarAtividadeFinalizada) {
-                            console.log("Atividade finalizada enviada com sucesso:", enviarAtividadeFinalizada);
-                        } else {
-                            console.error("Erro ao enviar a atividade finalizada");
-                        }
-                    }
-                } else {
-                    console.error("Erro ao atualizar a atividade em andamento: resposta indefinida.");
-                }
-            } catch (error) {
-                console.error("Erro ao atualizar a atividade em andamento:", error.response ? error.response.data : error.message);
-            }
+        try {
+            const idAtividadeEmAndamento = atividadesEmAndamento.length > 0 ? atividadesEmAndamento[0]._id : null;
+            if (todosExerciciosCobertos === true && temAtividadeAtual === true) {
+                    
+                    console.log(`id atividade em andamento sendo passado: ${idAtividadeEmAndamento}`);
+                    
+                    const enviarAtividadeEmAndamento = await atualizarAtividadeEmAndamento(idAtividadeEmAndamento, resolvedToken, atividadeData);
+                    console.log(enviarAtividadeEmAndamento ? "Atividade em andamento atualizada com sucesso:" : "Erro ao atualizar a atividade em andamento", enviarAtividadeEmAndamento);
+                    
+                    const enviarAtividadeFinalizada = await postarAtividadeFinalizada(idGrupoAtividades, resolvedToken);
+                    console.log(enviarAtividadeFinalizada ? "Atividade finalizada enviada com sucesso:" : "Erro ao enviar a atividade finalizada", enviarAtividadeFinalizada); 
+                    
+                    setModalAtividadeFinalizada(true);
+                    
+                    
+            }else{
+                
+                const enviarAtividadeEmAndamento = await atualizarAtividadeEmAndamento(idAtividadeEmAndamento, resolvedToken, atividadeData);
+                console.log(enviarAtividadeEmAndamento ? "Atividade em andamento atualizada com sucesso:" : "Erro ao atualizar a atividade em andamento", enviarAtividadeEmAndamento);
+
+
+                setModalAtividadeEmAndamento(true);
+            }   
+
+
+        } catch (error) {
+            console.error("Erro durante a operação:", error.response ? error.response.data : error.message);
         }
     
-        console.log("Processo de envio de atividades concluído.");
-    
-        // Navegação de volta
-        navigation.replace('GrupoAtividadesTela', { id: idGrupoAtividades });
+        console.log("Processo de envio de atividades concluído.");    
+        
     }
     
+
+    const voltarlAtividadeEmAndamento = () => {
+        navigation.replace('GrupoAtividadesTela', { id: idGrupoAtividades });
+    }
+
+    const voltarAtividadeFinalizada = () =>{
+        navigation.replace('Tabs');
+    }
     
-       
+     
 
     // Função para selecionar ou desmarcar a alternativa
 
@@ -312,19 +320,44 @@ export default function ExercicioTela({ navigation }) {
 
         }
 
+        
+
     };
 
     return (
-        <VStack>
+        <VStack flex={1}>
             {carregado && (
-                <VStack>
+                    <VStack>
+                    <ModalAtividade
+                            bodyText="Parabens, você terminou esse grupo!"
+                            confirmButtonText="Concluir"
+                            isVisible = {modalAtividadeFinalizada}
+                            onConfirm={voltarAtividadeFinalizada}
+                            onClose={() => setModalAtividadeFinalizada(false)}
+                            showCancelButton={false}
+                            width="100%"
+                            videoUrl={`https://stimularmidias.blob.core.windows.net/midias/6b130f17-3ef9-402d-b88b-95065076fb48.mp4${tokenMidia}`}
+                            />
+                
+                    <ModalAtividade
+                            bodyText="Você arrasou!"
+                            confirmButtonText="Concluir"
+                            isVisible = {modalVisible1}
+                            onConfirm={voltarlAtividadeEmAndamento}
+                            onClose={() => setModalAtividadeEmAndamento(false)}
+                            showCancelButton={false}
+                            width="100%"
+                            tamanhoDaTela={1}
+                            videoUrl={`https://stimularmidias.blob.core.windows.net/midias/ebb74e92-3ee5-4379-a829-28ed8c7fdfcf.mp4${tokenMidia}`}
+                            />
+
                     
                     <Titulo mt='10%' bold color='black' fontSize='2xl'>{`${atividadeTela.nomdeDaAtividade}`}</Titulo>
                     {exercicios.map((exercicio, index) => (
                         <VStack key={index} mt={4}>
                             {exercicio.midia && (
                                 <>
-                                    {exercicio.midia.tipoDeMidia.includes('image') ? (
+                                    {exercicio.midia.tipoDeMidia.includes('image') || exercicio.midia.url.endsWith('.gif') ? (
                                         <Image
                                             source={{ uri: `${exercicio.midia.url}${tokenMidia}` }}
                                             alt={exercicio.midia.url}

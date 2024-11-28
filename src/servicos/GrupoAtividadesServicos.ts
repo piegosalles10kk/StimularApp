@@ -42,25 +42,26 @@ export async function pegarAtividadesPorId(idGrupoAtividades: string ,idAtividad
   }
 }
 
-export async function postarAtividadeFinalizada(grupoAtividadeId: string ,token: string){
+export async function postarAtividadeFinalizada(grupoAtividadeId: string, token: string) {
   try {
-      const resultado = await api.post(`/grupoatividades/${grupoAtividadeId}/atividadesfinalizadas`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const resultado = await api.post(`/grupoatividades/${grupoAtividadeId}/atividadesfinalizadas`, {}, {
+          headers: {
+              Authorization: `Bearer ${token}`,
+          },
       });
+
       return resultado.data;
-  }catch(error){
-      console.log(error);
-      return null
+  } catch (error) {
+      console.error('Erro ao postar atividade finalizada:', error.response ? error.response.data : error.message);
+      return null;
   }
 }
 
-export async function postarAtividadeEmAndamento(grupoAtividadeId: string, token: string, 
-  respostas: Array<{ atividade_id: string; exercicioId: string; alternativaId: string; isCorreta: boolean; pontuacao: number; }>) {
+
+export async function postarAtividadeEmAndamento(grupoAtividadeId: string, token: string ) {
   try {
       const resultado = await api.post(`/grupoatividades/${grupoAtividadeId}/atividadesemandamento`, {
-          respostas: respostas // Adicionando o array de respostas ao corpo da requisição
+          respostas: {}
       }, {
           headers: {
               Authorization: `Bearer ${token}`,
@@ -90,6 +91,21 @@ export async function atualizarAtividadeEmAndamento(grupoAtividadeEmAndamentoId:
       return null;
   }
 }
+
+export async function apagarAtividadeEmAndamento(idAtividadeEmAndamento: string, token: string) {
+  try {
+      const resultado = await api.delete(`/atividadesemandamento/${idAtividadeEmAndamento}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return resultado.data;
+  } catch (error) {
+      console.error('Erro ao apagar a atividade em andamento:', error);
+      return null;
+  }
+}
+
 
 
 
