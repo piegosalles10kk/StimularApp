@@ -9,7 +9,7 @@ import AtividadeCard from "../../componentes/GrupoAtividadeCard";
 import { Botao } from "../../componentes/Botao";
 
 //Api
-import { pegarDadosUsuario, updateMoeda } from "../../servicos/PacienteServico";
+import { pegarDadosUsuario, updateMoeda } from "../../servicos/UserServico";
 import { pegarGruposAtividadesNivel, postarAtividadeEmAndamento } from "../../servicos/GrupoAtividadesServicos";
 import { ConquistaUsuario, GrupoAtividades, UsuarioGeral, Atividades, Exercicios } from "../../interfaces/UsuarioGeral";
 import { tokenMidia } from "../../utils/token";
@@ -141,7 +141,6 @@ return (
             height: 150,
           }}
         />
-        {carregado && (
           <Titulo
             fontSize='2xl'
             marginLeft='10%'
@@ -150,8 +149,6 @@ return (
           >
             {`Olá, ${dadosUsuario?.user?.nome?.split(' ')[0]}`}
           </Titulo>
-        )}
-        {carregado && (
           <View
             style={{
               width: '90%',
@@ -190,7 +187,6 @@ return (
             </HStack>
           </View>
 
-        )}
         {carregado && (
           <VStack>
 

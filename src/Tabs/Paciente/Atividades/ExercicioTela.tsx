@@ -4,7 +4,7 @@ import { Titulo } from "../../../componentes/Titulo";
 import { Alternativas, Atividades, Exercicios, UsuarioGeral } from "../../../interfaces/UsuarioGeral";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { pegarDadosUsuario } from "../../../servicos/PacienteServico";
+import { pegarDadosUsuario } from "../../../servicos/UserServico";
 import { pegarAtividadesPorId, pegarGruposAtividadesPorId, postarAtividadeEmAndamento, postarAtividadeFinalizada, atualizarAtividadeEmAndamento } from "../../../servicos/GrupoAtividadesServicos";
 import { tokenMidia } from "../../../utils/token";
 import { Video, ResizeMode } from 'expo-av';
@@ -40,9 +40,11 @@ export default function ExercicioTela({ navigation }) {
 
     const [modalAtividadeFinalizada, setModalAtividadeFinalizada] = useState(false);
 
+    const [notaAtividadeFinalizada, setNotaAtividadeFinalizada] = useState(0);
+
     const [selectedAlternative, setSelectedAlternative] = useState<{
 
-        alternativaResultado: string;
+        alternativaResultado: boolean;
 
         id: string;
 
@@ -202,7 +204,7 @@ export default function ExercicioTela({ navigation }) {
             atividade_id: idAtividade,
             exercicioId: exercicios[0].exercicioId,
             alternativaId: selectedAlternative?.id || null,
-            isCorreta: selectedAlternative?.alternativaResultado === 'true',
+            isCorreta: selectedAlternative?.alternativaResultado === true,
             pontuacao: exercicios[0]?.pontuacao || 0,
         };
     
@@ -251,10 +253,17 @@ export default function ExercicioTela({ navigation }) {
                     console.log(`id atividade em andamento sendo passado: ${idAtividadeEmAndamento}`);
                     
                     const enviarAtividadeEmAndamento = await atualizarAtividadeEmAndamento(idAtividadeEmAndamento, resolvedToken, atividadeData);
-                    console.log(enviarAtividadeEmAndamento ? "Atividade em andamento atualizada com sucesso:" : "Erro ao atualizar a atividade em andamento", enviarAtividadeEmAndamento);
+                    console.log(JSON.stringify({
+                      sucesso: enviarAtividadeEmAndamento,
+                      mensagem: enviarAtividadeEmAndamento ? "Atividade em andamento atualizada com sucesso" : "Erro ao atualizar a atividade em andamento",
+                      dados: enviarAtividadeEmAndamento
+                    }, null, 2));
                     
                     const enviarAtividadeFinalizada = await postarAtividadeFinalizada(idGrupoAtividades, resolvedToken);
-                    console.log(enviarAtividadeFinalizada ? "Atividade finalizada enviada com sucesso:" : "Erro ao enviar a atividade finalizada", enviarAtividadeFinalizada); 
+                    console.log(enviarAtividadeFinalizada ? "Atividade finalizada enviada com sucesso:" : "Erro ao enviar a atividade finalizada", enviarAtividadeFinalizada);
+                    
+                    const novaConvertida = parseInt(enviarAtividadeFinalizada.atividadeFinalizada.porcentagem)
+                    setNotaAtividadeFinalizada(novaConvertida)
                     
                     setModalAtividadeFinalizada(true);
                     
@@ -283,7 +292,7 @@ export default function ExercicioTela({ navigation }) {
     }
 
     const voltarAtividadeFinalizada = () =>{
-        navigation.replace('Tabs');
+        navigation.replace('Login');
     }
     
      
@@ -325,11 +334,12 @@ export default function ExercicioTela({ navigation }) {
     };
 
     return (
-        <VStack flex={1}>
+        <VStack flex={1} background='white'>
             {carregado && (
                     <VStack>
                     <ModalAtividade
-                            bodyText="Parabens, você terminou esse grupo!"
+                            bodyText= "Parabéns, grupo finalizado!"
+                            minimalText={`Seu total do foi ${notaAtividadeFinalizada}%.`}
                             confirmButtonText="Concluir"
                             isVisible = {modalAtividadeFinalizada}
                             onConfirm={voltarAtividadeFinalizada}
@@ -337,6 +347,8 @@ export default function ExercicioTela({ navigation }) {
                             showCancelButton={false}
                             width="100%"
                             videoUrl={`https://stimularmidias.blob.core.windows.net/midias/6b130f17-3ef9-402d-b88b-95065076fb48.mp4${tokenMidia}`}
+                            audioUrl={`https://stimularmidias.blob.core.windows.net/midias/som-em-andamento.mp3${tokenMidia}`}
+                            
                             />
                 
                     <ModalAtividade
@@ -349,10 +361,11 @@ export default function ExercicioTela({ navigation }) {
                             width="100%"
                             tamanhoDaTela={1}
                             videoUrl={`https://stimularmidias.blob.core.windows.net/midias/ebb74e92-3ee5-4379-a829-28ed8c7fdfcf.mp4${tokenMidia}`}
+                            audioUrl={`https://stimularmidias.blob.core.windows.net/midias/som-finalizado.mp3${tokenMidia}`}
                             />
 
                     
-                    <Titulo mt='10%' bold color='black' fontSize='2xl'>{`${atividadeTela.nomdeDaAtividade}`}</Titulo>
+                    <Titulo mt='15%' bold color='black' fontSize='2xl'>{`${atividadeTela.nomdeDaAtividade}`}</Titulo>
                     {exercicios.map((exercicio, index) => (
                         <VStack key={index} mt={4}>
                             {exercicio.midia && (
@@ -387,7 +400,8 @@ export default function ExercicioTela({ navigation }) {
                                         value={alternativa._id}
                                         isChecked={selectedAlternative?.id === alternativa._id}
                                         onChange={() => handleSelectAlternative(alternativa)}
-                                        accessibilityLabel={`Alternativa: ${alternativa?.alternativa}`} // Adicionando rótulo de acessibilidade
+                                        accessibilityLabel={`Alternativa: ${alternativa?.alternativa}`}
+                                        colorScheme='purple'
                                     />
                                     <Titulo ml={2}>{alternativa?.alternativa}</Titulo>
                                 </HStack>

@@ -10,6 +10,10 @@ import AlterarPerfil from "./Tabs/Paciente/Perfil/AlterarPerfil";
 import GrupoAtividadesTela from "./Tabs/Paciente/Atividades/GrupoAtividadesTela";
 import ExercicioTela from "./Tabs/Paciente/Atividades/ExercicioTela";
 import CadastroGrupo from "./CadastroGrupo";
+import RecuerarSenha from "./RecuperarSenha";
+import AlterarPerfilAdmin from "./Tabs/Admin/EditarUsuario/AlterarPerfilAdmin";
+import CriarUsuarioAdmin from "./Tabs/Admin/EditarUsuario/CriarUsuarioAdmin";
+import CriarAtividade from "./Tabs/Admin/Atividades/CriarAtividadeAdmin";
 
 
 const Tab = createNativeStackNavigator();
@@ -60,6 +64,30 @@ export default function Rotas() {
                     component={CadastroGrupo} 
                     options={{ headerShown: false }}
                     />
+
+                <Tab.Screen 
+                    name="RecuperarSenha" 
+                    component={RecuerarSenha} 
+                    options={{ headerShown: false }}
+                />
+
+                <Tab.Screen 
+                    name="AlterarPerfilAdmin" 
+                    component={AlterarPerfilAdmin} 
+                    options={{ headerShown: false }}
+                />
+
+                <Tab.Screen 
+                    name="CriarUsuarioAdmin" 
+                    component={CriarUsuarioAdmin} 
+                    options={{ headerShown: false }}
+                />
+
+                <Tab.Screen 
+                    name="CriarAtividade" 
+                    component={CriarAtividade} 
+                    options={{ headerShown: false }}
+                />
 
 
                 

@@ -71,7 +71,7 @@ const ModalTemplate: React.FC<Props> = ({
                                 </Botao>
                             )}
                             {showCancelButton && (
-                                <Botao mt='3%' onPress={handleCloseModal} alignSelf="center">
+                                <Botao mt='3%' onPress={handleCloseModal} alignSelf="center" mb='10%'>
                                     {cancelButtonText || 'Sair'}
                                 </Botao>
                             )}

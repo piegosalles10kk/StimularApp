@@ -16,7 +16,8 @@ export interface UsuarioCadastro {
           dataDeCriacao: Date
          };
          nivel: number;
-         conquistas?: ConquistaUsuario[]; 
+         conquistas?: ConquistaUsuario[];
+         ativo: boolean; 
     
            
 }

@@ -128,5 +128,39 @@ export interface Alternativas {
         }[];
         recupararSenha: boolean;
         codigoRecuperarSenha: string;
+        ativo: boolean;
     }
   }
+
+  export interface UsuarioGeral2 {
+    _id: string;
+    tipoDeConta: string;
+    conquistas: ConquistaUsuario[];
+    validade: string;
+    moeda: {
+        valor: number;
+        dataDeCriacao: Date;
+    };
+    nivel: number;
+    nome: string;
+    email: string;
+    telefone: string;
+    dataDeNascimento: string;
+    senha: string;
+    recuperarSenha: string;
+    foto: string;
+    profissional: Profissional[];
+    diagnostico: Diagnostico[];
+    grupo: string[];
+    gruposDeAtividadesEmAndamento: GruposDeAtividadesEmAndamento[];
+    gruposDeAtividadesFinalizadas: GruposDeAtividadesFinalizadas[];
+    descricao: Descricao[];
+    pacientes: Pacientes[];
+    gruposDeAtividadesCriadas: GrupoAtividades[];
+    pontuacoesPorGrupo: {
+        grupoId: string;
+        pontuacao: number;
+    }[];
+    recupararSenha: boolean;
+    codigoRecuperarSenha: string;
+}

@@ -1,17 +1,21 @@
-import { KeyboardTypeOptions } from 'react-native';
-import { Input, FormControl } from "native-base";
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+import { TextInput, HelperText } from 'react-native-paper';
 
 interface InputProps {
   label?: string;
   placeholder: string;
-  keyboardType?: KeyboardTypeOptions;
+  keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
   secureTextEntry?: boolean;
   value?: string;
   onChangeText?: (text: string) => void;
-  type?: string; // Adicionando type
+  type?: string;
+  errorMessage?: string;
+  tamanhoDoInput?: number;
+  multiline?: boolean; // Nova propriedade para permitir a quebra de linha
 }
 
-export function EntradaTexto ({
+export function EntradaTexto({
   label,
   placeholder,
   keyboardType,
@@ -19,9 +23,11 @@ export function EntradaTexto ({
   value,
   onChangeText,
   type,
+  errorMessage,
+  tamanhoDoInput = 40,
+  multiline = false // Valor padrão para a propriedade multiline
 }: InputProps): JSX.Element {
 
-  // Função para formatar a entrada da data
   const handleTextChange = (text: string) => {
     let formattedText = text.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
 
@@ -32,28 +38,35 @@ export function EntradaTexto ({
       formattedText = `${formattedText.slice(0, 5)}/${formattedText.slice(5, 9)}`;
     }
 
-    onChangeText && onChangeText(formattedText); // Chama a função de alteração com o texto formatado
+    onChangeText && onChangeText(formattedText);
   };
 
   return (
-    <FormControl mt={3}>
-      {label && <FormControl.Label>{label}</FormControl.Label>}
-      <Input
+    <View style={styles.container}>
+      <TextInput
+        label={label}
         placeholder={placeholder}
-        size="lg"
-        w="90%"
-        borderRadius="lg"
-        bgColor="gray.100"
-        secureTextEntry={secureTextEntry}
-        shadow={3}
-        _focus={{
-          borderColor: 'roxoClaro',
-          borderWidth: 2,
-        }}
         value={value}
-        onChangeText={type === 'data' ? handleTextChange : onChangeText} // Usando a formatação apenas para campos do tipo 'data'
+        onChangeText={type === 'data' ? handleTextChange : onChangeText}
         keyboardType={keyboardType}
+        secureTextEntry={secureTextEntry}
+        style={[styles.input, { height: tamanhoDoInput }]} // Aplicando dinamicamente o tamanho do input
+        mode="outlined"
+        error={!!errorMessage}
+        multiline={multiline} // Aplicando a propriedade multiline
       />
-    </FormControl>
+      {errorMessage && <HelperText type="error">{errorMessage}</HelperText>}
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    width: '90%',
+    marginBottom: 16,
+    alignSelf: 'center', // Centraliza o input
+  },
+  input: {
+    width: 300,
+  },
+});

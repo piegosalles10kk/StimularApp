@@ -6,7 +6,7 @@ import { avatares } from '../../../utils/Avatares';
 import { UsuarioGeral } from '../../../interfaces/UsuarioGeral';
 import { EntradaTexto } from '../../../componentes/EntradaTexto';
 import { Botao } from '../../../componentes/Botao';
-import { pegarDadosUsuario, atualizarPaciente } from '../../../servicos/PacienteServico';
+import { pegarDadosUsuario, atualizarPaciente } from '../../../servicos/UserServico';
 import { tokenMidia } from '../../../utils/token';
 
 const DismissKeyboard = ({ children }) => (
@@ -80,8 +80,8 @@ const AlterarPerfil = ({ navigation }) => {
             //console.log("Dados a serem salvos:", paciente); // Log para verificar os dados que estão sendo salvos
             const resultado = await atualizarPaciente(paciente, usuarioID, token);
             if (resultado) {
-                Alert.alert('Sucesso', 'Dados do usuário atualizados com sucesso');
-                navigation.replace('Tabs');
+                //Alert.alert('Sucesso', 'Dados do usuário atualizados com sucesso');
+                navigation.replace('Login');
             } else {
                 Alert.alert("Erro ao atualizar os dados do usuário");
             }
@@ -98,7 +98,7 @@ const AlterarPerfil = ({ navigation }) => {
                     <VStack alignItems='center' mt='10%'>
                     {carregado && (
                         <TouchableWithoutFeedback onPress={() => setShowModal(true)}>
-                            <Avatar size='200' borderWidth='2' shadow='5' source={{ uri: selectedAvatar ? `${selectedAvatar}${tokenMidia}` : `${dados.foto}${tokenMidia}` }} />                        
+                            <Avatar size='200' borderWidth='2' shadow='5'mb='5%' source={{ uri: selectedAvatar ? `${selectedAvatar}${tokenMidia}` : `${dados.foto}${tokenMidia}` }} />                        
                         </TouchableWithoutFeedback>
                     )}
 
@@ -108,15 +108,15 @@ const AlterarPerfil = ({ navigation }) => {
                                 label={campo.charAt(0).toUpperCase() + campo.slice(1)}
                                 placeholder={dados[campo]}
                                 value={dados[campo]}
-                                keyboardType={campo === 'email' ? 'email-address' : campo === 'telefone' ? 'phone-pad' : campo === 'dataDeNascimento' ? 'number-pad' : 'default'}
+                                keyboardType={campo === 'email' ? 'email-address' : campo === 'telefone' ? 'phone-pad' : campo === 'dataDeNascimento' ? 'numeric' : 'default'}
                                 type={campo === 'dataDeNascimento' ? 'data' : 'default'}
                                 onChangeText={(text) => atualizarDados(campo, text)}
                             />
                         ))}
                     </VStack>
+                    
                     <Botao onPress={handleSalvar}>Salvar</Botao>
 
-                    {/* Modal para selecionar avatares */}
                     <Modal visible={showModal} transparent animationType="slide">
                         <VStack style={styles.modalContainer}>
                             <VStack bg='white' p={5} borderRadius={10} style={styles.modalContent}>
@@ -126,7 +126,7 @@ const AlterarPerfil = ({ navigation }) => {
                                         <HStack key={rowIndex} justifyContent='center' mb={4}>
                                             {Avatares.slice(rowIndex * 3, rowIndex * 3 + 3).map((avatar, index) => (
                                                 <TouchableWithoutFeedback key={index} onPress={() => {
-                                                    console.log("Avatar selecionado:", avatar.imagemAvatar); // Log para confirmar qual avatar foi selecionado
+                                                    console.log("Avatar selecionado:", avatar.imagemAvatar);
                                                     setSelectedAvatar(avatar.imagemAvatar);
                                                     setShowModal(false);
                                                 }}>

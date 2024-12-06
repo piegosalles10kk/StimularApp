@@ -11,7 +11,7 @@ import { GrupoAtividades, UsuarioGeral, Atividades, GruposDeAtividadesFinalizada
 
 // Api
 
-import { pegarDadosUsuario, updateMoeda } from "../../../servicos/PacienteServico";
+import { pegarDadosUsuario, updateMoeda } from "../../../servicos/UserServico";
 
 import { pegarGruposAtividadesPorId, postarAtividadeEmAndamento } from "../../../servicos/GrupoAtividadesServicos";
 

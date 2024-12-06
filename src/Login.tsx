@@ -9,9 +9,9 @@ import { ImagemLogo } from './componentes/ImagemLogo';
 import { fazerLogin } from './servicos/AutenticacaoServico';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
-import { GruposDeAtividadesEmAndamento, UsuarioGeral } from './interfaces/UsuarioGeral';
-import { pegarDadosUsuario, updateMoeda } from './servicos/PacienteServico';
+import { pegarDadosUsuario, updateMoeda } from './servicos/UserServico';
 import { apagarAtividadeEmAndamento } from './servicos/GrupoAtividadesServicos';
+import { UsuarioGeral } from './interfaces/UsuarioGeral';
 
 const DismissKeyboard = ({ children }) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -24,6 +24,8 @@ export default function Login({ navigation } : any) {
 const [email, setEmail] = useState('');
 const [senha, setSenha] = useState('');
 const [carregando, setCarregando] = useState(true);
+
+const [dadosUsuario, setDadosUsuario] = useState({} as UsuarioGeral);
 
 const toast = useToast();
 
@@ -44,17 +46,37 @@ useEffect(() => {
         const tokenDecodificado = jwtDecode(token);
         const grupoDoUser =  tokenDecodificado.grupo;
 
-        console.log('Grupo do usuário:', grupoDoUser); // Log do grupo
+        const idUsuario = await AsyncStorage.getItem('id');
+        const tokenDecoded = await AsyncStorage.getItem('token');
+
+
+        const resultado = await pegarDadosUsuario(idUsuario, tokenDecoded);
+        //console.log('Resultado do usuário:', resultado); 
+        
+
+        //console.log('Grupo do usuário:', grupoDoUser);
+
+     if(resultado.user.ativo === false){
+          AsyncStorage.removeItem('id');
+          AsyncStorage.removeItem('token');
+          AsyncStorage.removeItem('tipoDeConta');
+
+          Alert.alert('Conta desativada');
+          toast.show({
+              title: "Erro ao fazer login",
+              description: "Conta desativada",
+              backgroundColor: "roxoClaro",
+          });
+          navigation.replace('Login');
+    }
+    else{  
+
+      console.log("Usuário ativo");
+      
 
         if (Array.isArray(grupoDoUser) && grupoDoUser.length > 0) {
             console.log('Navegando para Tabs');
             navigation.replace('Tabs');
-
-            const idUsuario = await AsyncStorage.getItem('id');
-            const tokenDecoded = await AsyncStorage.getItem('token');
-
-            const resultado = await pegarDadosUsuario(idUsuario, tokenDecoded);
-            console.log('Resultado do usuário:', resultado); // Log do resultado
 
             const gruposDeAtividades = resultado.user.gruposDeAtividadesEmAndamento || []; // Default para array vazio
             const dataDaMoeda = resultado.user.moeda.dataDeCriacao || null; // Se a data não existir, define como null
@@ -117,6 +139,7 @@ useEffect(() => {
             console.log('Navegando para Outra Tela');
             navigation.replace('CadastroGrupo');
         }
+      }
     } else {
         console.log('Token não encontrado');
     }
@@ -140,31 +163,51 @@ async function login(){
     const id = tokenDecodificado.id;
     const tipoDeConta = tokenDecodificado.tipoDeConta;
     const grupoDoUser = tokenDecodificado.grupo; 
+    const ativo = tokenDecodificado.ativo;
+    
 
-    console.log('Token Decodificado:', tokenDecodificado);
-    console.log('ID:', id);
-    console.log('Tipo de Conta:', tipoDeConta);
-    console.log('Grupo do User:', grupoDoUser);
+    //console.log('Token Decodificado:', tokenDecodificado);
+    //console.log('ID:', id);
+    //console.log('Tipo de Conta:', tipoDeConta);
+    //console.log('Grupo do User:', grupoDoUser);
 
     AsyncStorage.setItem('id', id);
     AsyncStorage.setItem('tipoDeConta', tipoDeConta);
     AsyncStorage.setItem('grupoDoUser', JSON.stringify(grupoDoUser));
+    AsyncStorage.setItem('ativo', ativo);
 
-    if (Array.isArray(grupoDoUser) && grupoDoUser.length > 0) {
-        console.log('Navegando para Tabs');
-        navigation.replace('Tabs');
+    if (ativo === true) {
+      console.log('Conta ativa');
+      
+        if (Array.isArray(grupoDoUser) && grupoDoUser.length > 0) {
+            console.log('Navegando para Tabs');
+            navigation.replace('Tabs');
+        } else {
+            console.log('Navegando para Outra Tela');
+            navigation.replace('CadastroGrupo');
+        }
     } else {
-        console.log('Navegando para Outra Tela');
-        navigation.replace('CadastroGrupo');
+        AsyncStorage.removeItem('id');
+        AsyncStorage.removeItem('token');
+        AsyncStorage.removeItem('tipoDeConta');
+
+        Alert.alert('Conta desativada');
+        toast.show({
+            title: "Erro ao fazer login",
+            description: "Conta desativada",
+            backgroundColor: "roxoClaro",
+        });
     }
-} else {
-    Alert.alert('Alerta', 'Email ou senha inválidos');
-    toast.show({
-        title: "Erro ao fazer login",
-        description: "Email ou senha incorretos",
-        backgroundColor: "roxoClaro",
-    });
+
+    } else {
+        Alert.alert('Alerta', 'Email ou senha inválidos');
+        toast.show({
+            title: "Erro ao fazer login",
+            description: "Email ou senha incorretos",
+            backgroundColor: "roxoClaro",
+        });
 }
+
 
 }
 if (carregando){
@@ -203,7 +246,7 @@ if (carregando){
 
         <Botao onPress={login}>Entrar</Botao>
 
-        <Link href='https://www.google.com.br' mt={2}>
+        <Link onPress={() => navigation.navigate('RecuperarSenha')} mt={2}>
           Esqueceu sua senha?
         </Link>
         

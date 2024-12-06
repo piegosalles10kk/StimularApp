@@ -81,19 +81,19 @@ const tabsProfissional = [
 
 const tabsAdmin = [
     {
-        name: 'Principal',
-        component: PrincipalAdmin,
-        icon: 'home'
-    },
-    {
         name: 'Atividades',
-        component: AtividadesAdmin,
-        icon: 'book'
+        component: PrincipalAdmin,
+        icon: 'documents-outline'
     },
     {
-        name: 'Perfil',
+        name: 'Criar',
+        component: AtividadesAdmin,
+        icon: 'add'
+    },
+    {
+        name: 'Contas',
         component: PerfilAdmin,
-        icon: 'person'
+        icon: 'people'
     },
 ];
 

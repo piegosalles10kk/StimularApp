@@ -1,3 +1,4 @@
+import { GrupoAtividades } from "../interfaces/UsuarioGeral";
 import api from "./api";
 
 export async function pegarGruposAtividadesNivel(token: string, nivel: number, grupo: Array<string> = [], tipoAtividade: Array<string> = []) {
@@ -95,6 +96,52 @@ export async function atualizarAtividadeEmAndamento(grupoAtividadeEmAndamentoId:
 export async function apagarAtividadeEmAndamento(idAtividadeEmAndamento: string, token: string) {
   try {
       const resultado = await api.delete(`/atividadesemandamento/${idAtividadeEmAndamento}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return resultado.data;
+  } catch (error) {
+      console.error('Erro ao apagar a atividade em andamento:', error);
+      return null;
+  }
+}
+
+export async function pegarGruposAtividadesGeralAdmin(token: string) {
+  try {
+    const resultado = await api.get(`/grupoatividades`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return resultado.data;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
+
+export async function cadastrarAtividade(token: string, atividade: any) {
+  if(!atividade) return null;
+
+  try{
+      const resultado = await api.post('/grupoatividades', atividade,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      console.log(resultado.data);
+      return resultado.data
+  }
+  catch(error){
+      console.log(error);
+      return null;
+  };
+}
+
+export async function apagarGrupoDeAtividades(idAtividadeEmAndamento: string, token: string) {
+  try {
+      const resultado = await api.delete(`/grupoatividades/${idAtividadeEmAndamento}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

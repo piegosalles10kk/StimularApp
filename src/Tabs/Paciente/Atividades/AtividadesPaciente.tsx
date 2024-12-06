@@ -10,7 +10,7 @@ import AtividadeCard from "../../../componentes/GrupoAtividadeCard";
 import Graficos from "../../../componentes/Graficos";
 
 // Api
-import { pegarDadosUsuario, updateMoeda } from "../../../servicos/PacienteServico";
+import { pegarDadosUsuario, updateMoeda } from "../../../servicos/UserServico";
 import { pegarGruposAtividadesNivel, postarAtividadeEmAndamento } from "../../../servicos/GrupoAtividadesServicos";
 import ModalTemplate from "../../../componentes/Modal";
 
@@ -20,7 +20,7 @@ export default function AtividadesPaciente( { navigation } ) {
         { id: 1, nome: 'Física', icone: 'body', busca: 'Fisica' },
         { id: 2, nome: 'Linguística', icone: 'chatbubbles', busca: 'Linguistica' },
         { id: 3, nome: 'Cognitiva', icone: 'extension-puzzle', busca: 'Cognitiva' },
-        { id: 4, nome: 'Socioafetiva', icone: 'happy', busca: 'socioafetiva' },
+        { id: 4, nome: 'Socioafetiva', icone: 'happy', busca: 'Socioafetiva' },
     ];
 
     const [dataFinalizadas, setDataFinalizadas] = useState({} as any);

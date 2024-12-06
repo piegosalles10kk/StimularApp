@@ -1,4 +1,4 @@
-export const atividades = [
+export const perguntasDiagnosticos = [
     {
         id: 1,
         idade: "1",
@@ -77,7 +77,63 @@ export const atividades = [
                     { id: 10, questao: "Leva a comida à boca com ajuda, utilizando uma colher." },
                     { id: 11, questao: "Estende os braços e pernas para facilitar o ato de vestir-se." }
                 ]
-            }
+            }, 
+            {
+                habilidade: "motor",
+                exercicios: [
+                    { id: 1, questao: "Alcança objetos posicionados a uma distância de 15 a 20 cm." },
+                    { id: 2, questao: "Pega um objeto localizado a 8 cm de distância." },
+                    { id: 3, questao: "Estende os braços e pega um item a sua frente." },
+                    { id: 4, questao: "Alcança seu objeto favorito de forma independente." },
+                    { id: 5, questao: "Coloca objetos na boca por curiosidade ou exploração." },
+                    { id: 6, questao: "Levanta a cabeça e o tronco enquanto se apoia nos braços de barriga para baixo." },
+                    { id: 7, questao: "Sustenta-se no tronco com apoio em apenas um braço." },
+                    { id: 8, questao: "Explora objetos utilizando a boca para reconhecer texturas." },
+                    { id: 9, questao: "Vira de lado e mantém-se nessa posição enquanto está de barriga para baixo." },
+                    { id: 10, questao: "Rola de costas exibindo a posição para baixo." },
+                    { id: 11, questao: "Move-se para frente e equivalente à sua altura em posição ventral." },
+                    { id: 12, questao: "Rola para o lado em posição dorsal." },
+                    { id: 13, questao: "Vira-se de costas para a barriguinha em posição dorsal." },
+                    { id: 14, questao: "Tenta sentar-se com ajuda, segurando os dedos de um adulto." },
+                    { id: 15, questao: "Gira a cabeça facilmente quando o corpo está bem apoiado." },
+                    { id: 16, questao: "Permanece sentado por até 2 minutos sem apoio adicional." },
+                    { id: 17, questao: "Larga um objeto para pegar outro ao mesmo tempo." },
+                    { id: 18, questao: "Derruba intencionalmente objetos e observa a reação." },
+                    { id: 19, questao: "Fica de pé com apoio máximo para equilíbrio." },
+                    { id: 20, questao: "Dá pequenos saltos para cima e para baixo com apoio." },
+                    { id: 21, questao: "Engatinhar para pegar objetos localizados ao alcance." },
+                    { id: 22, questao: "Senta-se sozinho, usando as mãos para apoio inicial." },
+                    { id: 23, questao: "Deitado, gira e se posiciona de joelhos para sentar-se." },
+                    { id: 24, questao: "Senta-se sem o uso das mãos como suporte." },
+                    { id: 25, questao: "Atira objetos aleatoriamente ao interagir com o ambiente." },
+                    { id: 26, questao: "Move-se para frente e para trás enquanto engatinha." },
+                    { id: 27, questao: "Troca objetos de uma mão para outra enquanto está sentado." },
+                    { id: 28, questao: "Segura dois pequenos cubos de 2,5 cm ao mesmo tempo." },
+                    { id: 29, questao: "Posiciona-se de joelhos ao explorar o ambiente." },
+                    { id: 30, questao: "Fica de pé para apoiar-se em móveis ou outros objetos." },
+                    { id: 31, questao: "Usa a preensão de pinça para segurar pequenos itens." },
+                    { id: 32, questao: "Engatinha por curtas distâncias de maneira eficiente." },
+                    { id: 33, questao: "Estica uma mão para o alto enquanto engatinha." },
+                    { id: 34, questao: "Mantém-se de pé com apoio mínimo de outros." },
+                    { id: 35, questao: "Lambe restos de comida ao redor da boca." },
+                    { id: 36, questao: "Fica de pé sem apoio por até um minuto." },
+                    { id: 37, questao: "Derruba brinquedos colocados dentro de recipientes." },
+                    { id: 38, questao: "Folheia várias páginas de um livro de uma vez." },
+                    { id: 39, questao: "Usa colheres ou outros para escavar pequenos montes." },
+                    { id: 40, questao: "Coloca objetos pequenos dentro de recipientes intencionais." },
+                    { id: 41, questao: "Abaixa-se para pegar algo no chão enquanto está de pé." },
+                    { id: 42, questao: "Bate palmas ao observar ou ouvir estímulos." },
+                    { id: 43, questao: "Dá pequenos passos com apoio mínimo." },
+                    { id: 44, questao: "Anda sem ajuda por curtas distâncias." },
+                    { id: 45, questao: "Sobe escadas engatinhando de maneira independente." }
+                ]
+            },
+            {
+                habilidade: "teste",
+                exercicios: [
+                    { id: 1, questao: "Isso aqui só existe pq se não o programa quebra" },
+                ]
+            }            
         ]
     },
     {
@@ -178,7 +234,13 @@ export const atividades = [
                     { id: 17, questao: "Imita movimentos circulares simples ao desenhar." },
                     { id: 18, questao: "Enfia contas grandes em cordões dentro de 2 minutos." }
                 ]
-            }
+            },
+            {
+                habilidade: "teste",
+                exercicios: [
+                    { id: 1, questao: "Isso aqui só existe pq se não o programa quebra" },
+                ]
+            } 
         ]
     },
     {
@@ -265,7 +327,13 @@ export const atividades = [
                     { id: 10, questao: "Desmonta e remonta brinquedos que possuem peças encaixáveis." },
                     { id: 11, questao: "Chuta bolas grandes que estão paradas." }
                 ]
-            }
+            },
+            {
+                habilidade: "teste",
+                exercicios: [
+                    { id: 1, questao: "Isso aqui só existe pq se não o programa quebra" },
+                ]
+            } 
         ]
     },
     {
@@ -343,7 +411,13 @@ export const atividades = [
                     { id: 4, questao: "Anda na ponta dos pés com equilíbrio." },
                     { id: 5, questao: "Agacha fazendo movimentos com os braços ao subir." }
                 ]
-            }
+            },
+            {
+                habilidade: "teste",
+                exercicios: [
+                    { id: 1, questao: "Isso aqui só existe pq se não o programa quebra" },
+                ]
+            } 
         ]
     },
     {
@@ -423,7 +497,13 @@ export const atividades = [
                     { id: 8, questao: "Executa tarefas domésticas semanais ao ser lembrado." },
                     { id: 9, questao: "Recorta e cola formas básicas no papel." }
                 ]
-            }
+            },
+            {
+                habilidade: "teste",
+                exercicios: [
+                    { id: 1, questao: "Isso aqui só existe pq se não o programa quebra" },
+                ]
+            } 
         ]
     },
     {
@@ -503,7 +583,25 @@ export const atividades = [
                     { id: 9, questao: "Rasga figuras simples de papel com as mãos." },
                     { id: 10, questao: "Dobra um papel quadrado duas vezes em dele mesmo." }
                 ]
+            },
+            {
+                habilidade: "teste",
+                exercicios: [
+                    { id: 1, questao: "Isso aqui só existe pq se não o programa quebra" },
+                ]
+            } 
+        ]
+    },
+    {
+        id: 7,
+        idade: "N/A",
+        grupoDeExercicios: [
+            {
+                habilidade: "Mais uma vez",
+                exercicios: [
+                    { id: 1, questao: "É só pro codigo não EXPLODIR" },
+                ]
             }
         ]
-    }
+    }    
 ];

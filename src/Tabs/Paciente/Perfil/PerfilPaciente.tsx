@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 //Api
-import { pegarDadosUsuario } from "../../../servicos/PacienteServico";
+import { pegarDadosUsuario } from "../../../servicos/UserServico";
 import {  UsuarioGeral } from "../../../interfaces/UsuarioGeral";
 import { Titulo } from "../../../componentes/Titulo";
 import { diagnosticos } from "../../../utils/Diagnosticos";
@@ -75,8 +75,7 @@ useEffect(() => {
         AsyncStorage.removeItem('id');
         AsyncStorage.removeItem('token');
         AsyncStorage.removeItem('tipoDeConta');
-        alert('Deslogado com sucesso');
-        
+
         navigation.replace('Login');
     }
 
@@ -208,8 +207,8 @@ useEffect(() => {
             
             </VStack>
             
-            <Titulo bold color='black' fontSize='md'>{`${dadosUsuario?.user?.grupo?.join(' | ')}`}</Titulo>
-            <Titulo fontSize='md'>{`${idade.idadeEmMeses}(meses)`}</Titulo>
+            <Titulo bold color='black' fontSize='md'>{`${dadosUsuario?.user?.grupo?.join(' | ')} ${dadosUsuario.user.nivel} ano(s)`}</Titulo>
+            <Titulo fontSize='md'>{`${idade.anos}a | ${idade.meses}m `}</Titulo>
 
             
 
