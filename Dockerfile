@@ -1,5 +1,5 @@
-# Use uma imagem base oficial do Node.js
-FROM node:14
+# Use uma imagem base mais recente do Node.js
+FROM node:18
 
 # Instale o Expo CLI globalmente
 RUN npm install -g expo-cli
