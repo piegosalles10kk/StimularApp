@@ -16,10 +16,8 @@ RUN npm install
 # Copie o restante do código para o diretório de trabalho
 COPY . .
 
-# Exponha a porta em que o aplicativo será executado
-EXPOSE 19000
-EXPOSE 19001
-EXPOSE 19002
+# Exponha a porta necessária para o Expo
+EXPOSE 8081
 
 # Defina o comando para rodar a aplicação
-CMD ["npx", "expo", "start", "--tunnel"]
+CMD ["npx", "expo", "start", "--tunnel", "--port", "8081"]
