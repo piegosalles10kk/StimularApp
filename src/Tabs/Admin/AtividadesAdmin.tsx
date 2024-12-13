@@ -52,7 +52,7 @@ const [quantidadeAtividades, setQuantidadeAtividades] = useState(0);
             <VStack borderWidth='2' w='40%' h='80%' mr='5%' borderRadius='5%' borderColor='black'>
 
                 <VStack >
-                    <Titulo textAlign='center' fontSize='md' bold color='black'>Contas cadastrados</Titulo>
+                    <Titulo textAlign='center' fontSize='xl' bold color='black'>Contas cadastrados</Titulo>
                     <Titulo highlight bold color='red.500'>{quantidadeUsuarios}</Titulo>
                     
                 </VStack>
@@ -63,11 +63,11 @@ const [quantidadeAtividades, setQuantidadeAtividades] = useState(0);
             <VStack borderWidth='2' w='40%' h='80%' borderRadius='5%'>  
 
                 <VStack >
-                    <Titulo textAlign='center' fontSize='md' bold color='black'>Atividades cadastradas</Titulo>
+                    <Titulo textAlign='center' fontSize='xl' bold color='black'>Atividades cadastradas</Titulo>
                     <Titulo highlight bold color='red.500'>{quantidadeAtividades}</Titulo>
                     
                 </VStack> 
-                <Botao w='90%' h='40%' alignSelf='center' onPress={() => navigation.navigate('CriarAtividade')}ml='5%' >Criar atividade</Botao>
+                <Botao w='90%' h='40%' mr ='5%' alignSelf='center' onPress={() => navigation.navigate('CriarAtividade')}ml='5%' >Criar atividade</Botao>
             </VStack> 
             </VStack>
 

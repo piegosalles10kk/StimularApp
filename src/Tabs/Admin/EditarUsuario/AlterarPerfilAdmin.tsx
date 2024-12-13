@@ -130,6 +130,8 @@ const AlterarPerfilAdmin = ({ navigation }) => {
             quality: 1,
         });
     
+        console.log('Resultado da câmera:', result); // Debug log
+    
         if (!result.canceled) {
             await processImage(result);
         }
@@ -149,32 +151,49 @@ const AlterarPerfilAdmin = ({ navigation }) => {
             quality: 1,
         });
     
+        console.log('Resultado da galeria:', result); // Debug log
+    
         if (!result.canceled) {
             await processImage(result);
         }
     };
     
     const processImage = async (result) => {
+        console.log('Processando imagem:', result); // Log do resultado
+    
         const source = {
             uri: result.assets[0].uri,
             type: result.assets[0].type || 'image/jpeg',
-            fileName: result.assets[0].fileName || 'photo.jpg'
+            fileName: result.assets[0].fileName || 'photo.jpg',
         };
     
-        const userId = dados.email
-        console.log('ID do usuário:', userId);
+        const email = dados.email;
     
-        const response = await enviarFotoDePerfil(userId, source);
+        console.log('Enviando imagem com as seguintes informações:', {
+            uri: source.uri,
+            type: source.type,
+            fileName: source.fileName,
+        });
     
-        if (response) {
-            setSelectedAvatar(response.url);
-            Alert.alert('Imagem enviada com sucesso!');
-        } else {
-            Alert.alert('Erro ao enviar a imagem');
+        try {
+            // Remover o timeout temporariamente para diagnóstico
+            const response = await enviarFotoDePerfil(email, source);
+    
+            if (response) {
+                setSelectedAvatar(response.url);
+                Alert.alert('Imagem enviada com sucesso!');
+            } else {
+                Alert.alert('Erro ao enviar a imagem');
+            }
+        } catch (error) {
+            console.error('Erro ao enviar a imagem:', error.message);
+            Alert.alert('Ocorreu um erro ao enviar a imagem. Tente novamente.');
+        } finally {
+            setShowModal(false);
         }
-    
-        setShowModal(false);
     };
+    
+    
     
     const abrirModal2 =  () => {
         setModal2(true);

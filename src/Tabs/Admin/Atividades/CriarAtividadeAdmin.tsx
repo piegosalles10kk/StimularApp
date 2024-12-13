@@ -181,23 +181,36 @@ export default function CriarAtividade({ navigation }) {
     const processImageExercicio = async (media) => {
         const source = {
             uri: media.uri,
-            type: media.type || 'image/jpeg',
-            fileName: media.fileName || 'photo.jpg'
+            type: media.mimeType || media.type || 'image/jpeg', // Usar mimeType se disponível
+            fileName: media.fileName || 'photo.jpg',
         };
-
+    
         const userId = `${grupoAtividade.identificador}Exercicio${grupoAtividade.atividades.length}midia`;
-        const response = await enviarFotoDePerfil(userId, source);
-
-        if (response) {
-            setNovoExercicio(prev => ({
-                ...prev,
-                midia: { url: response.url, tipoDeMidia: media.type }
-            }));
-            alert('Mídia enviada com sucesso!');
-        } else {
-            alert('Erro ao enviar a mídia');
+    
+        try {
+            // Defina o tempo limite para 10 segundos (10.000 ms)
+            const timeout = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Tempo de espera excedido')), 10000)
+            );
+    
+            // Execute a requisição e aguarde a resposta
+            const response = await Promise.race([enviarFotoDePerfil(userId, source), timeout]);
+    
+            if (response) {
+                setNovoExercicio(prev => ({
+                    ...prev,
+                    midia: { url: response.url, tipoDeMidia: media.type },
+                }));
+                alert('Mídia enviada com sucesso!');
+            } else {
+                alert('Erro ao enviar a mídia');
+            }
+        } catch (error) {
+            console.error('Erro ao enviar a mídia:', error.message);
+            alert('Ocorreu um erro ao enviar a mídia. Tente novamente.');
         }
     };
+    
 
     const escolherImagemAtividade = async () => {
         const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -221,20 +234,33 @@ export default function CriarAtividade({ navigation }) {
     const processImageAtividade = async (media) => {
         const source = {
             uri: media.uri,
-            type: media.type || 'image/jpeg',
-            fileName: media.fileName || 'photo.jpg'
+            type: media.mimeType || media.type || 'image/jpeg', // Usar mimeType se disponível
+            fileName: media.fileName || 'photo.jpg',
         };
-
+    
         const userId = `${grupoAtividade.identificador}Exercicio${grupoAtividade.atividades.length}`;
-        const response = await enviarFotoDePerfil(userId, source);
-
-        if (response) {
-            setNovaAtividade(prev => ({ ...prev, fotoDaAtividade: response.url }));
-            alert('Mídia enviada com sucesso!');
-        } else {
-            alert('Erro ao enviar a mídia');
+    
+        try {
+            // Defina o tempo limite para 10 segundos (10.000 ms)
+            const timeout = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Tempo de espera excedido')), 10000)
+            );
+    
+            // Execute a requisição e aguarde a resposta
+            const response = await Promise.race([enviarFotoDePerfil(userId, source), timeout]);
+    
+            if (response) {
+                setNovaAtividade(prev => ({ ...prev, fotoDaAtividade: response.url }));
+                alert('Mídia enviada com sucesso!');
+            } else {
+                alert('Erro ao enviar a mídia');
+            }
+        } catch (error) {
+            console.error('Erro ao enviar a mídia:', error.message);
+            alert('Ocorreu um erro ao enviar a mídia. Tente novamente.');
         }
     };
+    
 
     const escolherImagem = async () => {
         const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -261,19 +287,26 @@ export default function CriarAtividade({ navigation }) {
     const processImage = async (media) => {
         if (!media) {
             alert('Nenhuma mídia foi fornecida.');
+            console.error('Nenhuma mídia foi fornecida.');
             return;
         }
     
         const source = {
             uri: media.uri,
-            type: media.type ,
-            fileName: media.fileName || media.uri.split('/').pop() || 'photo.jpg' // Usa o nome do arquivo da URI
+            type: media.mimeType || media.type || 'image/jpeg', // Usar mimeType se disponível
+            fileName: media.fileName || media.uri.split('/').pop() || 'photo.jpg', // Usa o nome do arquivo da URI
         };
     
         const userId = grupoAtividade.identificador;
     
         try {
-            const response = await enviarFotoDePerfil(userId, source);
+            // Defina o tempo limite para 10 segundos (10.000 ms)
+            const timeout = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Tempo de espera excedido')), 10000)
+            );
+    
+            // Execute a requisição e aguarde a resposta
+            const response = await Promise.race([enviarFotoDePerfil(userId, source), timeout]);
     
             if (response) {
                 setGrupoAtividade(prev => ({ ...prev, imagem: response.url }));
@@ -282,10 +315,11 @@ export default function CriarAtividade({ navigation }) {
                 alert('Erro ao enviar a imagem');
             }
         } catch (error) {
-            console.error('Erro ao enviar a imagem:', error);
+            console.error('Erro ao enviar a imagem:', error.message);
             alert('Ocorreu um erro ao enviar a imagem. Tente novamente.');
         }
     };
+    
     
 
     const criarAtividade = async () => {

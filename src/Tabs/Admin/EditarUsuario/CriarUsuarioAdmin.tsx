@@ -119,25 +119,34 @@ const CriarUsuarioAdmin = ({ navigation }) => {
     const processImage = async (result) => {
         const source = {
             uri: result.assets[0].uri,
-            type: result.assets[0].type || 'image/jpeg',
-            fileName: result.assets[0].fileName || 'photo.jpg'
+            type: result.assets[0].type || 'image/jpeg', // Usar o tipo fornecido ou 'image/jpeg' como padrão.
+            fileName: result.assets[0].fileName || 'photo.jpg', // Usar o nome do arquivo fornecido ou 'photo.jpg' como padrão.
         };
     
-
         const email = dados.email;
     
-        const response = await enviarFotoDePerfil(email, source );
+        try {
+            // Defina o tempo limite para 10 segundos (10.000 ms)
+            const timeout = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Tempo de espera excedido')), 10000)
+            );
     
-        if (response) {
-            setSelectedAvatar(response.url);
-            Alert.alert('Imagem enviada com sucesso!');
-        } else {
-            Alert.alert('Erro ao enviar a imagem');
+            // Execute a requisição e aguarde a resposta
+            const response = await Promise.race([enviarFotoDePerfil(email, source), timeout]);
+    
+            if (response) {
+                setSelectedAvatar(response.url);
+                Alert.alert('Imagem enviada com sucesso!');
+            } else {
+                Alert.alert('Erro ao enviar a imagem');
+            }
+        } catch (error) {
+            console.error('Erro ao enviar a imagem:', error.message);
+            Alert.alert('Ocorreu um erro ao enviar a imagem. Tente novamente.');
+        } finally {
+            setShowModal(false);
         }
-    
-        setShowModal(false);
     };
-    
     
 
     const handleSalvar = async () => {
@@ -195,7 +204,7 @@ const CriarUsuarioAdmin = ({ navigation }) => {
                         condicao: 0
                     },
                     {
-                    nome: "Então é isso",
+                    nome: "Descobri!",
                     imagem: "https://stimularmidias.blob.core.windows.net/midias/54bb0ad7-70a9-405c-85b4-626033aaea81.png",
                     descricao: "Concluiu o teste",
                     condicao: 0
@@ -295,53 +304,61 @@ const CriarUsuarioAdmin = ({ navigation }) => {
                     renderItem={renderItem}
                     ListHeaderComponent={(
                         <VStack alignItems='center' mt='10%'>
-                           
-                                <TouchableWithoutFeedback onPress={() => setShowModal(true)}>
-                                    <Avatar size='200' borderWidth='2' shadow='5' mb='5%' source={{ uri: selectedAvatar ? `${selectedAvatar}${tokenMidia}` : `${dados.foto}${tokenMidia}` }} />
-                                </TouchableWithoutFeedback>
-
-                                
-                            
+                            <TouchableWithoutFeedback onPress={() => setShowModal(true)}>
+                                <Avatar
+                                    size='200'
+                                    borderWidth='2'
+                                    shadow='5'
+                                    mb='5%'
+                                    source={{ uri: selectedAvatar ? `${selectedAvatar}${tokenMidia}` : `${dados.foto}${tokenMidia}` }}
+                                />
+                            </TouchableWithoutFeedback>
                         </VStack>
                     )}
                 />
-                
-                <Botao alignSelf='center' mb='5%%' onPress={handleSalvar}>Salvar</Botao>
-                <Titulo bold color='red.500' fontSize='sm' mb='25%'>A imagem deve ser inserida por ultimo!</Titulo>
+    
+                <Botao alignSelf='center' mb={5} onPress={handleSalvar}>Salvar</Botao>
+                <Titulo bold color='red.500' fontSize={12} mb={25}>A imagem deve ser inserida por ultimo!</Titulo>
+    
                 <Modal visible={showModal} transparent animationType="slide">
-                    <VStack style={styles.modalContainer}>
-                        <VStack bg='white' p={5} borderRadius={10} style={styles.modalContent}>
-                            <Text style={styles.modalTitle}>Escolha seu novo Avatar</Text>
-                            <ScrollView>
-                                <HStack justifyContent='center' mb={4}>
-                                    <TouchableWithoutFeedback onPress={handleImageSelection}>
-                                        <VStack alignItems='center'>
-                                            <Icon name="camera" size="50" color="gray" />
-                                            <Text>Selecionar outra foto</Text>
-                                        </VStack>
-                                    </TouchableWithoutFeedback>
-                                </HStack>
-                                {Array.from({ length: Math.ceil(Avatares.length / 3) }).map((_, rowIndex) => (
-                                    <HStack key={rowIndex} justifyContent='center' mb={4}>
-                                        {Avatares.slice(rowIndex * 3, rowIndex * 3 + 3).map((avatar, index) => (
-                                            <TouchableWithoutFeedback key={index} onPress={() => {
-                                                setSelectedAvatar(avatar.imagemAvatar);
-                                                setShowModal(false);
-                                            }}>
-                                                <Avatar size='71' source={{ uri: `${avatar.imagemAvatar}${tokenMidia}` }} style={styles.avatar} />
-                                            </TouchableWithoutFeedback>
-                                        ))}
-                                    </HStack>
-                                ))}
-                            </ScrollView>
-                            <Botao alignSelf='center' onPress={() => setShowModal(false)}>Fechar</Botao>
+    <VStack style={styles.modalContainer}>
+        <VStack bg='white' p={5} borderRadius={10} style={styles.modalContent}>
+            <Titulo bold color='black'>Escolha seu novo Avatar</Titulo>
+
+            <ScrollView>
+                <HStack justifyContent='center' mb={4}>
+                    <TouchableWithoutFeedback onPress={handleImageSelection}>
+                        <VStack alignItems='center'>
+                            <Icon name="camera" size={50} color="gray" />
+                            <Titulo>Selecionar outra foto</Titulo>
                         </VStack>
-                    </VStack>
-                </Modal>
+                    </TouchableWithoutFeedback>
+                </HStack>
+
+                {Array.from({ length: Math.ceil(Avatares.length / 3) }).map((_, rowIndex) => (
+                    <HStack key={rowIndex} justifyContent='center' mb={4}>
+                        {Avatares.slice(rowIndex * 3, rowIndex * 3 + 3).map((avatar, index) => (
+                            <TouchableWithoutFeedback key={index} onPress={() => {
+                                setSelectedAvatar(avatar.imagemAvatar);
+                                setShowModal(false);
+                            }}>
+                                <Avatar size={71} source={{ uri: `${avatar.imagemAvatar}${tokenMidia}` }} style={styles.avatar} />
+                            </TouchableWithoutFeedback>
+                        ))}
+                    </HStack>
+                ))}
+            </ScrollView>
+
+            <Botao alignSelf='center' onPress={() => setShowModal(false)}>Fechar</Botao>
+        </VStack>
+    </VStack>
+</Modal>
+
             </KeyboardAvoidingView>
         </DismissKeyboard>
     );
-};
+}
+    
 
 const styles = StyleSheet.create({
     modalContainer: {
@@ -358,7 +375,6 @@ const styles = StyleSheet.create({
         margin: 10,
     },
     modalTitle: {
-        fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 10,
         textAlign: 'center',
