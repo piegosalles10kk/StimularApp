@@ -53,7 +53,7 @@ const secoes = [
       titulo: 'Crie uma senha',
       entradaTexto:[
         {
-            id: 1,
+            id: 2,
             label: 'Senha',
             placeholder: 'Digite sua senha',
             secureTextEntry : true,
@@ -61,7 +61,7 @@ const secoes = [
                       
           },
           {
-            id: 2,
+            id: 3,
             label: 'Confirmar senha',
             placeholder: 'Confirme sua senha',
             secureTextEntry : true,

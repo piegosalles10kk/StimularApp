@@ -11,6 +11,13 @@ export interface UsuarioCadastro {
          foto: string;
          profissional: profissional[];
          validade: string;
+         erros: {
+          socializacao: [],
+          cognicao: [],
+          linguagem: [],
+          autoCuidado: [],
+          motor: [],
+      },
          moeda: {
           valor: number,
           dataDeCriacao: Date

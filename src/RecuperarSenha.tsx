@@ -4,10 +4,10 @@ import { VStack } from 'native-base';
 import { Titulo } from './componentes/Titulo';
 import { EntradaTexto } from './componentes/EntradaTexto';
 import { Botao } from './componentes/Botao';
-import { Video, ResizeMode } from 'expo-av';
 import { tokenMidia } from './utils/token';
 import { alterarSenhaRecuperacao, enviarCodigo, enviarEmail } from './servicos/UserServico';
 import { ImagemLogo } from './componentes/ImagemLogo';
+import ModalAtividade from './componentes/modalAtividades';
 
 
 
@@ -20,6 +20,7 @@ const DismissKeyboard = ({ children }) => (
 export default function RecuperarSenha( {navigation}) {
     const [numSecao, setNumSecao] = useState(0);
     const [dados, setDados] = useState<{ [key: string]: any }>({} as any);
+    const [modalVisivel, setModalVisivel] = useState(false);
 
     const recuperarSenhaPerguntas = [
         {
@@ -53,14 +54,14 @@ export default function RecuperarSenha( {navigation}) {
             titulo: 'Crie uma nova senha:',
             entradaTexto: [
                 {
-                    id: 1,
+                    id: 2,
                     label: 'Nova Senha',
                     placeholder: 'Digite sua nova senha',
                     name: 'senha',
                     secureTextEntry: true
                 },
                 {
-                    id: 2,
+                    id: 3,
                     label: 'Confirmar Senha',
                     placeholder: 'Confirme sua nova senha',
                     name: 'confirmarSenha',
@@ -71,10 +72,12 @@ export default function RecuperarSenha( {navigation}) {
     ];
 
     const avancarSecao1 = async () => {
+        setModalVisivel(true);
         const email = dados.email;
         const emailResponse = await enviarEmail(email);
         if (emailResponse) {
             setNumSecao(numSecao + 1);
+            setModalVisivel(false);
         } else {
             Alert.alert('Email não encontrado!');
         }
@@ -135,6 +138,16 @@ export default function RecuperarSenha( {navigation}) {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{ flex: 1 }}
             >
+                <ModalAtividade
+                bodyText="Aguarde um momento!"
+                minimalText="Estamos enviando seu email de recuperação de senha!"
+                detailsText="Jamais passe o codigo para outra pessoa!"
+                isVisible={modalVisivel}
+                onClose={() => setModalVisivel(false)}
+                showCancelButton={false}
+                width="100%"
+                videoUrl={`https://stimularmidias.blob.core.windows.net/midias/aguardando${tokenMidia}`}
+            />
                 <VStack flex={1} bg="white" alignContent="center" alignItems="center" padding="10">
                     <ImagemLogo />
                     <VStack mt="10%">

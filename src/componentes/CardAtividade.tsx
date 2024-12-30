@@ -4,6 +4,15 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { Titulo } from './Titulo';
 import { tokenMidia } from '../utils/token';
 
+const nomesCorretos = {
+    'socializacao': 'Socialização',
+    'motorizacao': 'Motorização',
+    'linguagem': 'Linguagem',
+    'autoCuidado': 'Auto-Cuidado',
+    'motor': 'Motor',
+    'cognicao': 'Cognição',
+};
+
 const CardAtividade = ({
     titulo,
     descricao,
@@ -19,6 +28,13 @@ const CardAtividade = ({
     // Suponha que a altura original seja calculada ou conhecida
     const originalHeight = 100; // Exemplo de altura original
     const newHeight = originalHeight + 2;
+
+    // Função para substituir termos na descrição
+    const substituirDescricao = (descricao) => {
+        return descricao.split(' ').map((palavra) => {
+            return nomesCorretos[palavra] || palavra; // Substitui ou mantém a palavra original
+        }).join(' '); // Junta as palavras novamente
+    };
 
     return (
         <VStack
@@ -43,14 +59,17 @@ const CardAtividade = ({
 
             <VStack display="flex" flexDirection="column" flex={1} alignSelf="center">
                 <Titulo style={textStyle} fontWeight="bold" fontSize='md' color="black">
-                    {titulo}
+                    {titulo.length > 34
+                        ? titulo.substring(0, 34) + "..."
+                        : titulo}
                 </Titulo>
+
                 <Text style={textStyle} fontSize="xs" alignSelf='center'>
-                    {descricao}
+                    ({substituirDescricao(descricao)}) 
                 </Text>
             </VStack>
 
-            {buttonVisible && ( // Renderiza o botão somente se buttonVisible for true
+            {buttonVisible && (
                 <Button
                     alignSelf="center"
                     leftIcon={<Icon name="play" size={24} color="white" />}

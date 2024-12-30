@@ -40,7 +40,6 @@ export default function PerfilAdmin({ navigation }) {
         AsyncStorage.removeItem('id');
         AsyncStorage.removeItem('token');
         AsyncStorage.removeItem('tipoDeConta');
-        alert('Deslogado com sucesso');
         navigation.replace('Login');
     }
 

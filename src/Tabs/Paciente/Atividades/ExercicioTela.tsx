@@ -1,4 +1,4 @@
-import { VStack, Image, HStack, Checkbox } from "native-base";
+import { VStack, Image, HStack, Checkbox, ScrollView } from "native-base";
 import { useRoute } from '@react-navigation/native';
 import { Titulo } from "../../../componentes/Titulo";
 import { Alternativas, Atividades, Exercicios, UsuarioGeral } from "../../../interfaces/UsuarioGeral";
@@ -10,6 +10,7 @@ import { tokenMidia } from "../../../utils/token";
 import { Video, ResizeMode } from 'expo-av';
 import { Botao } from "../../../componentes/Botao";
 import ModalAtividade from "../../../componentes/modalAtividades";
+import React from "react";
 
 export default function ExercicioTela({ navigation }) {
 
@@ -53,6 +54,10 @@ export default function ExercicioTela({ navigation }) {
     const [exerciciosDoUsuario, setExerciciosDoUsuario] = useState([] as any);
 
     const [exerciciosDoGrupo, setExerciciosDoGrupo] = useState([] as any);
+
+    const [notaAtividade, setNotaAtividade] = useState(1);
+
+    const [vezesExercicios, setVezesExercicios] = useState(0);
 
     const route = useRoute(); // Obtendo a rota
 
@@ -197,6 +202,8 @@ export default function ExercicioTela({ navigation }) {
 
 
     async function salvarAtividade() {
+
+        if (vezesExercicios === 9){
         const resolvedToken = await token;
     
         // Estrutura base das respostas
@@ -243,7 +250,9 @@ export default function ExercicioTela({ navigation }) {
             exercicioId: resposta.exercicioId,
             alternativaId: resposta.alternativaId,
             isCorreta: resposta.isCorreta,
-            pontuacao: resposta.pontuacao,
+            pontuacao: notaAtividade,
+            pontuacaoPossivel: resposta.pontuacao,
+            tipoAtividade: atividadeTela.tipoDeAtividade
         };
     
         try {
@@ -283,7 +292,18 @@ export default function ExercicioTela({ navigation }) {
         }
     
         console.log("Processo de envio de atividades concluído.");    
+     
+    }else{
+        setVezesExercicios(vezesExercicios + 1);
+        console.log("Vezes: ", vezesExercicios + 1);
+
+        if (selectedAlternative?.alternativaResultado === false){
+            setNotaAtividade(notaAtividade - (1 * 0.10));  
+        }
+        console.log("Nota Atividade: ", notaAtividade);
+        setSelectedAlternative(null);
         
+    }
     }
     
 
@@ -334,6 +354,7 @@ export default function ExercicioTela({ navigation }) {
     };
 
     return (
+        <ScrollView flex={1}>
         <VStack flex={1} background='white'>
             {carregado && (
                     <VStack>
@@ -365,7 +386,7 @@ export default function ExercicioTela({ navigation }) {
                             />
 
                     
-                    <Titulo mt='15%' bold color='black' fontSize='2xl'>{`${atividadeTela.nomdeDaAtividade}`}</Titulo>
+                    <Titulo mt='15%'  color='black' fontSize='2xl'>{`${atividadeTela.nomdeDaAtividade}`}</Titulo>
                     {exercicios.map((exercicio, index) => (
                         <VStack key={index} mt={4}>
                             {exercicio.midia && (
@@ -393,7 +414,7 @@ export default function ExercicioTela({ navigation }) {
                                     )}
                                 </>
                             )}
-                            <Titulo fontSize='lg' padding='3%' mt='5%'>{exercicio.enunciado}</Titulo>
+                            <Titulo fontSize='md' padding='3%' mt='5%' bold color='black' alignSelf='flex-start' textAlign='left'>{exercicio.enunciado}</Titulo>
                             {alternativas.map((alternativa, index) => (
                                 <HStack key={index} alignItems="center" padding='5%'>
                                     <Checkbox
@@ -402,6 +423,7 @@ export default function ExercicioTela({ navigation }) {
                                         onChange={() => handleSelectAlternative(alternativa)}
                                         accessibilityLabel={`Alternativa: ${alternativa?.alternativa}`}
                                         colorScheme='purple'
+                                        style={{ width: 35, height: 35 }}
                                     />
                                     <Titulo ml={2}>{alternativa?.alternativa}</Titulo>
                                 </HStack>
@@ -409,9 +431,13 @@ export default function ExercicioTela({ navigation }) {
                             ))}                           
                         </VStack>
                     ))}
-                    <Botao alignSelf='center' onPress={salvarAtividade}>Salvar</Botao>
+                    <Botao alignSelf='center' onPress={salvarAtividade} mb='30%'>
+                        {vezesExercicios === 9 ? 'Enviar respostas' : `Tentativa ${vezesExercicios + 1} de 10`}
+                    </Botao>
+
                 </VStack>
             )}   
         </VStack>
+        </ScrollView>
     );
 }

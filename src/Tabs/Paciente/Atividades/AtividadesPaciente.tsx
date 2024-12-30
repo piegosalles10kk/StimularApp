@@ -1,21 +1,21 @@
-import { ImagemLogo } from "../../../componentes/ImagemLogo";
-import { VStack, ScrollView, HStack, Box, Pressable } from "native-base";
+import { VStack, ScrollView, HStack } from "native-base";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Titulo } from "../../../componentes/Titulo";
 import { useEffect, useState } from "react";
+import { Alert, Linking, Image } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Platform } from 'react-native';
-import {  GrupoAtividades, UsuarioGeral, Atividades, GruposDeAtividadesFinalizadas } from "../../../interfaces/UsuarioGeral";
+import { UsuarioGeral } from "../../../interfaces/UsuarioGeral";
 import AtividadeCard from "../../../componentes/GrupoAtividadeCard";
 import Graficos from "../../../componentes/Graficos";
 
 // Api
 import { pegarDadosUsuario, updateMoeda } from "../../../servicos/UserServico";
-import { pegarGruposAtividadesNivel, postarAtividadeEmAndamento } from "../../../servicos/GrupoAtividadesServicos";
+import { pegarGruposAtividadesAuto, postarAtividadeEmAndamento } from "../../../servicos/GrupoAtividadesServicos";
 import ModalTemplate from "../../../componentes/Modal";
+import { Botao } from "../../../componentes/Botao";
+import { tokenMidia } from "../../../utils/token";
 
-
-export default function AtividadesPaciente( { navigation } ) {
+export default function AtividadesPaciente({ navigation }) {
     const listaCategorias = [
         { id: 1, nome: 'Física', icone: 'body', busca: 'Fisica' },
         { id: 2, nome: 'Linguística', icone: 'chatbubbles', busca: 'Linguistica' },
@@ -23,341 +23,269 @@ export default function AtividadesPaciente( { navigation } ) {
         { id: 4, nome: 'Socioafetiva', icone: 'happy', busca: 'Socioafetiva' },
     ];
 
-    const [dataFinalizadas, setDataFinalizadas] = useState({} as any);
-    const [pontuacoesFinais, setPontuacoesFinais] = useState({} as any);
+    const [dataFinalizadas, setDataFinalizadas] = useState([] as any);
+    const [pontuacoesFinais, setPontuacoesFinais] = useState([] as any);
     const [categoriasSelecionadas, setCategoriasSelecionadas] = useState<string[]>([]);
     const [dadosUsuario, setDadosUsuario] = useState({} as UsuarioGeral);
-    const [dadosAtividades, setDadosAtividades] = useState({} as GrupoAtividades);
-    const [listaAtividades, setListaAtividades] = useState({} as Atividades);
+    const [dadosAtividades, setDadosAtividades] = useState<any>(null); // Inicia como null
+    const [listaAtividades, setListaAtividades] = useState<any>(null); // Inicia como null
     const [carregadoGrafico, setCarregandoGrafico] = useState(false);
     const [carregado, setCarregando] = useState(false);
-
-    
     const [modalVisible1, setModalVisible1] = useState(false);
-
     const [modalVisible2, setModalVisible2] = useState(false);
+    const [atividadeId, setAtividadeId] = useState('');
 
-    const [ atividadeId, setAtividadeId ] = useState('');
-
-    const handleCategoriaClick = async (busca: string) => {
-        console.log(`Categoria clicada: ${busca}`); // Log de validação
-        setCarregando(false); // A partir de agora, marcaremos como carregando
-    
-        // Atualiza as categorias selecionadas
-        setCategoriasSelecionadas(prev => {
-            const isSelected = prev.includes(busca);
-            const newCategorias = isSelected
-                ? prev.filter(item => item !== busca) // Remove se já estiver selecionado
-                : [...prev, busca]; // Adiciona se não estiver selecionado
-    
-            //console.log('Categorias selecionadas:', newCategorias);
-    
-            // Chama a função para atualizar dadosAtividades com as novas categorias
-            atualizarDadosAtividades(newCategorias); // Passa o novo array de categorias
-            return newCategorias;
-        });
-    };
-
-    
-    //Logica de moeda
-
-    const handleOpenModal = (atividadeIdParam) => {
-        setAtividadeId(atividadeIdParam);
-        const grupoAtividadesId = dadosAtividades.atividades[0]._id;
-    
-        console.log(dadosAtividades.atividades[0]._id);
-    
-        // Verifica se o array de grupos de atividades em andamento não está vazio
-        if (dadosUsuario.user.gruposDeAtividadesEmAndamento.length > 0) {
-            // Agora verificamos o grupoAtividadesId do primeiro elemento do array
-            const atividadeEmAndamento = dadosUsuario.user.gruposDeAtividadesEmAndamento[0];
-            
-            if (atividadeEmAndamento.grupoAtividadesId === grupoAtividadesId) {
-                navigation.navigate('ExercicioTela', { atividadeId: atividadeId, idGrupoAtividades: grupoAtividadesId });
-            } else {
-                setModalVisible1(true);
-            }
-        } else {
-            console.warn('Nenhuma atividade em andamento encontrada.');
-            setModalVisible1(true);  // Mostramos o modal se não houver atividades em andamento
-        }
-    };
-    
     const tornarBotaoVisivel = async () => {
-        const grupoAtividadesId = dadosAtividades.atividades[0]._id;
-    
+        const grupoAtividadesId = dadosAtividades?.atividades[0]?._id; // Usar o operador de encadeamento opcional
+
         if (dadosUsuario.user.moeda.valor > 0) {
             await atualizarMoeda();
-            console.log('Atividade ID:', atividadeId);
             navigation.navigate('ExercicioTela', { atividadeId: atividadeId, idGrupoAtividades: grupoAtividadesId });
         } else {
             setModalVisible2(true);
         }
     };
-    
-      const atualizarMoeda = async () => {
-          try {
-              const usuarioID = await AsyncStorage.getItem('id');
-              const token = await AsyncStorage.getItem('token');
-    
-              console.log(`UsuarioID: ${usuarioID}, Token: ${token}`);
-    
-              if (dadosUsuario.user.moeda.valor >= 1) {
-                  const resultado = await updateMoeda(usuarioID, token, { moeda: { valor: dadosUsuario.user.moeda.valor - 1 } });
-                  console.log('Moeda atualizada para:', dadosUsuario.user.moeda.valor - 1);
-                   
-                  const enviarAtividadeEmAndamento = await postarAtividadeEmAndamento(dadosAtividades.atividades[0]._id, token);
-                  console.log('Atividade enviada:', enviarAtividadeEmAndamento);
-                  
 
-              } else {
-                  setModalVisible2(true)
-                  
-              }
-          } catch (error) {
-              console.error('Erro ao acessar AsyncStorage:', error);
-          }
-      };
-    
-    const atualizarDadosAtividades = async (novasCategoriasSelecionadas) => {
-        const [usuarioID, token] = await Promise.all([
-            AsyncStorage.getItem('id'),
-            AsyncStorage.getItem('token')
-        ]);
-    
-        // Verificar se o usuário e o token estão disponíveis
-        if (!usuarioID || !token) {
-            console.error('Erro ao obter dados do usuário ou token');
-            return;
-        }
-    
-        const nivel = dadosUsuario.user.nivel;
-        const grupo = dadosUsuario.user.grupo;
-        //console.log(nivel, grupo, novasCategoriasSelecionadas); // Usar as novas categorias
-    
-        // Log dos dados que serão enviados para a API
-        console.log('Enviando dados para a rota:', {
-            usuarioID,
-            token,
-            categoriasSelecionadas: novasCategoriasSelecionadas // Usar novas categorias
-        });
-    
+    const atualizarMoeda = async () => {
         try {
-            // Chamar a função que busca os grupos de atividades
-            const resultadoAtividade = await pegarGruposAtividadesNivel(token, nivel, grupo, novasCategoriasSelecionadas);
-    
-            // Log do resultado da atividade recebida
-            //console.log('Atividades recebidas:', resultadoAtividade);
-    
-            // Atualiza os estados relacionados a atividades
-            setDadosAtividades(resultadoAtividade);
-            setListaAtividades(resultadoAtividade.atividades[0]);
-    
-            const gruposDeAtividadesFinalizadas = dadosUsuario.user.gruposDeAtividadesFinalizadas || [];
-            const dataFinalizadasTemp = gruposDeAtividadesFinalizadas.map(atividade => atividade.dataFinalizada);
-            const pontuacoesFinaisTemp = gruposDeAtividadesFinalizadas.map(atividade => atividade.porcentagem);
-    
-            setDataFinalizadas(dataFinalizadasTemp);
-            setPontuacoesFinais(pontuacoesFinaisTemp);
+            const usuarioID = await AsyncStorage.getItem('id');
+            const token = await AsyncStorage.getItem('token');
+
+            if (dadosUsuario.user.moeda.valor >= 1) {
+                await updateMoeda(usuarioID, token, { moeda: { valor: dadosUsuario.user.moeda.valor - 1 } });
+                await postarAtividadeEmAndamento(dadosAtividades?.atividades[0]._id, token);
+            } else {
+                setModalVisible2(true);
+            }
         } catch (error) {
-            console.error('Erro ao buscar atividades:', error);
-        } finally {
-            setCarregando(true); // Marcar como não carregando após atualização
-            console.log(`A pagina está carregando? ${carregado}`);
-            
+            console.error('Erro ao acessar AsyncStorage:', error);
         }
     };
-    
-    
-    useEffect(() => {
-        async function dadosUsuario() {
-            const usuarioID = await AsyncStorage.getItem('id');
-            if (!usuarioID) {
-                console.error('erro ao pegar o id do usuario');
-                return;
-            }
-    
-            const token = await AsyncStorage.getItem('token');
-            if (!token) {
-                console.error('erro ao pegar o token');
-                return;
-            }
-    
-            const resultado = await pegarDadosUsuario(usuarioID, token);
-    
-            if (resultado) {
-                setDadosUsuario(resultado);
-    
-                // Log dos dados do usuário e atividades antes de fazer a requisição
-                //console.log('Dados do usuário recebidos:', resultado);
-    
-                const resultadoAtividade = await pegarGruposAtividadesNivel(token, resultado.user.nivel, resultado.user.grupo, categoriasSelecionadas);
-    
-                // Log do resultado da atividade antes de armazená-la
-                //console.log('Atividades recebidas:', resultadoAtividade);
-        
-                // Extraindo os dados desejados
-                const dataFinalizadasTemp = (Object.values(resultado.user.gruposDeAtividadesFinalizadas).map((atividade: GruposDeAtividadesFinalizadas) => atividade.dataFinalizada));
-                const pontuacoesFinaisTemp = (Object.values(resultado.user.gruposDeAtividadesFinalizadas).map((atividade: GruposDeAtividadesFinalizadas) => atividade.porcentagem));
-    
-                setDataFinalizadas(dataFinalizadasTemp);
-                setPontuacoesFinais(pontuacoesFinaisTemp);
-                setDadosAtividades(resultadoAtividade);
-                setListaAtividades(resultadoAtividade.atividades[0]);
-                setCarregando(true);
-            } else {
-                console.error("erro ao pegar os dados do usuario");
-            }
+
+const atualizarDadosAtividades = async () => {
+    const [usuarioID, token] = await Promise.all([AsyncStorage.getItem('id'),AsyncStorage.getItem('token')]);
+    if (!usuarioID || !token) {
+        console.error('Erro ao obter dados do usuário ou token');
+        return;
+    }
+
+    try {
+        const resultadoAtividade = await pegarGruposAtividadesAuto(token);
+        setDadosAtividades(resultadoAtividade.gruposAtividades[0]);
+        setListaAtividades(resultadoAtividade.gruposAtividades[0].atividades || []);
+
+        if (!dadosUsuario.user) {
+            console.error('Erro ao obter dados do usuário');
+            return;
         }
-    
-        dadosUsuario(); // Carrega os dados no início da montagem do componente
+
+        let gruposDeAtividadesFinalizadas = dadosUsuario.user.gruposDeAtividadesFinalizadas || [];
+
+        while (gruposDeAtividadesFinalizadas === undefined) {
+            gruposDeAtividadesFinalizadas = dadosUsuario.user.gruposDeAtividadesFinalizadas || [];
+            console.log(gruposDeAtividadesFinalizadas);
+        }
+
+
+
+        const processarAtividades = (gruposDeAtividadesFinalizadas) => {
+            const dataFinalizadasTemp = gruposDeAtividadesFinalizadas.map(atividade => atividade.dataFinalizada);
+        
+            const pontuacoesPorTipo = {
+                socializacao: [],
+                cognicao: [],
+                linguagem: [],
+                autoCuidado: [],
+                motor: []
+            };
+        
+            gruposDeAtividadesFinalizadas.forEach(atividade => {
+                atividade.respostasFinais.forEach(resposta => {
+                    // Adiciona a pontuação ao array correspondente ao tipo de atividade
+                    pontuacoesPorTipo[resposta.tipoAtividade].push(resposta.porcentagem);
+                });
+            });
+        
+            const pontuacoesFinaisTemp = [
+                pontuacoesPorTipo.socializacao,
+                pontuacoesPorTipo.cognicao,
+                pontuacoesPorTipo.linguagem,
+                pontuacoesPorTipo.autoCuidado,
+                pontuacoesPorTipo.motor
+            ];
+        
+            //console.log(pontuacoesPorTipo); // Adicione essa linha para o debug
+        
+            setDataFinalizadas(dataFinalizadasTemp);
+            setPontuacoesFinais(pontuacoesFinaisTemp);
+            setCarregandoGrafico(dataFinalizadasTemp.length > 0 && pontuacoesFinaisTemp.length > 0);
+        };
+        
+        
+        // Exemplo de como chamar a função
+        processarAtividades(gruposDeAtividadesFinalizadas);
+        
+        
+    } catch (error) {
+        console.error('Erro ao buscar atividades:', error);
+        if (error.response && error.response.status === 404) {
+            Alert.alert("Erro ao buscar atividades", "Atividades não encontradas. Por favor, tente novamente mais tarde.");
+        }
+    } finally {
+        setCarregando(true);
+    }
+};
+
+for (let i = 0; i < 2; i++) {
+    atualizarDadosAtividades()
+}
+
+    useEffect(() => {
+        async function fetchDadosUsuario() {
+            const usuarioID = await AsyncStorage.getItem('id');
+            const token = await AsyncStorage.getItem('token');
+
+            if (!usuarioID || !token) {
+                console.error('Erro ao obter ID ou token do usuário');
+                return;
+            }
+
+            const resultado = await pegarDadosUsuario(usuarioID, token);
+            setDadosUsuario(resultado);
+            atualizarDadosAtividades();
+        }
+        fetchDadosUsuario();
     }, []);
 
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            if (dataFinalizadas.length && pontuacoesFinais.length) {
-                setCarregandoGrafico(true);
-                clearInterval(intervalId);
-            }
-        }, 1000); // Verifica a cada 1 segundo
+    const handleOpenModal = (atividadeIdParam: string) => {
+        setAtividadeId(atividadeIdParam);
+        const grupoAtividadesId = dadosAtividades?._id;
 
-        return () => clearInterval(intervalId); // Limpa o intervalo quando o componente desmontar
-    }, [dataFinalizadas, pontuacoesFinais]);
+        if (dadosUsuario.user.gruposDeAtividadesEmAndamento.length > 0) {
+            const atividadeEmAndamento = dadosUsuario.user.gruposDeAtividadesEmAndamento[0];
+
+            if (atividadeEmAndamento.grupoAtividadesId === grupoAtividadesId) {
+                navigation.navigate('ExercicioTela', { atividadeId: atividadeIdParam, idGrupoAtividades: grupoAtividadesId });
+            } else {
+                setModalVisible1(true);
+            }
+        } else {
+            console.warn('Nenhuma atividade em andamento encontrada.');
+            setModalVisible1(true);
+        }
+    };
 
     return (
         <ScrollView contentContainerStyle={{ alignItems: 'center' }} showsVerticalScrollIndicator={false}>
-            <VStack
-                paddingTop={5}
-                paddingBottom={5}
-                width='100%' // Garante que o VStack ocupe toda a largura
-                alignItems='center' // Centraliza na horizontal
-                justifyContent='center'
-            >
-                <ImagemLogo
-                    style={{
-                        width: 200,
-                        height: 150,
-                    }}
-                />
+            <VStack paddingTop={5} paddingBottom={5} width='100%' alignItems='center' justifyContent='center'>
 
-                <VStack
-                    backgroundColor='roxoClaro'
-                    borderWidth='2'
-                    borderRadius={10}
-                    width='90%' // Ajuste a largura para evitar corte
-                    padding={3}
-                >
-                    <HStack
-                        alignItems='center'
-                        justifyContent='space-between' // Mantém os itens na mesma linha
-                        space={2} // Pode ser ajustado
-                        backgroundColor='roxoClaro'
-                        borderRadius={20}
-                    >
+            <Titulo bold color='black' mt='8%' mb='5%'>Atividades de {dadosUsuario?.user?.nome?.split(' ')[0]}</Titulo>
 
-                        <VStack flexDirection='row' alignItems='center' space={2} flexWrap='nowrap' justifyContent='center'>
-                            {listaCategorias.map((categoria) => (
-                                <Pressable 
-                                    key={categoria.id} 
-                                    onPress={() => handleCategoriaClick(categoria.busca)} // Adiciona evento de clique
-                                >
-                                    <Box
-                                        borderWidth='1'
-                                        borderColor='black'
-                                        borderRadius={10}
-                                        padding={3}
-                                        paddingLeft={Platform.OS === 'ios' ? '4%' : '6%'} // Aumentado para melhorar a centralização
-                                        backgroundColor={categoriasSelecionadas.includes(categoria.busca) ? 'lightgrey' : 'white'} // Muda a cor do box se selecionado
-                                        flexShrink={1}
-                                        flexGrow={1}
-                                        marginRight={2}
-                                        maxWidth='120px'
-                                        alignItems="center" // Centraliza o conteúdo horizontalmente
-                                        justifyContent="center" // Centraliza o conteúdo verticalmente
-                                    >
-                                        <HStack alignItems='center' flexDirection='column' justifyContent='center'>
-                                            <Titulo
-                                                fontSize='2xs'
-                                                bold
-                                                textAlign='center'
-                                                color={'black'} 
-                                            >
-                                                {categoria.nome}
-                                            </Titulo>
-                                            <Ionicons
-                                                name={categoria.icone}
-                                                size={24}
-                                                color={'black'}
-                                            />
-                                        </HStack>
-                                    </Box>
-                                </Pressable>
-                            ))}
+            {carregadoGrafico === false && (
+                    <VStack borderWidth={2} borderRadius={10} w='93%' alignItems='center'>
+                        <VStack flex={1}>
+                            <Titulo fontSize='xl' mt='5%' mb='5%' bold color='black'>Estamos te esperando!</Titulo>
+                            <Titulo fontSize='md' color='black'>Seu gráfico será exibido após a conclusão de sua primeira atividade!</Titulo>
+                            <Titulo mt='4%' mb='5%' fontSize='lg' bold color='black'>Enquanto isso, que tal nos acompanhar em nosso Instagram!</Titulo>
+                            <VStack flexDirection='row' padding='4%' alignSelf='center' w='90%'>
+                                <Ionicons
+                                    name={'logo-instagram'}
+                                    size={50}
+                                    color={'black'}
+                                    onPress={() => Linking.openURL('https://www.instagram.com/stimular.multidisciplinar')}
+                                />
+                            </VStack>
                         </VStack>
-                    </HStack>
-                </VStack>
+                    </VStack>
+                )}
+                
+                {carregadoGrafico && (
+                    <VStack width='90%' mt='5%' alignItems='center'>
+                        <VStack paddingTop={2} paddingBottom={2} backgroundColor='roxoClaro' width='100%' alignItems='center' justifyContent='center' borderWidth='2'>
+                            <Titulo fontSize='xl' bold color='black'>Como estou indo</Titulo>
+                        </VStack>
+                        <VStack width='100%' alignItems='center' justifyContent='center' borderWidth='2' mt='3%' padding={4} bg='roxoClaro'>
+                        <Graficos labels={dataFinalizadas} dataSets={pontuacoesFinais} quantidade={7} />
+                        </VStack>
+                    </VStack>
+                )}
+                    <Titulo alignSelf='flex-start' fontSize='md' ml='5%' mt='2%'textAlign='left' color='black'>O grafico acima demonstra a evolução do usuário com relação aos seus resultados recentes.</Titulo>
+                    
+                    <Titulo textAlign='left' mt='5%' bold color='black'>Precisa de ajuda?</Titulo>
 
-                <VStack width='90%' mt='5%'>
+                    <Botao mt='5%'>Consulte nossa lista de profissionais</Botao>
+                    
+                <VStack width='100%' mt='5%'>
                     {carregado && (
-            
                         <VStack>
-
                             <ModalTemplate
-                                bodyText="Ao clicar em continuar voce irá iniciar a atividade. Tem certeza que deseja continuar?" 
+                                bodyText="Ao clicar em continuar você irá iniciar a atividade. Tem certeza que deseja continuar?"
                                 confirmButtonText="Continuar"
                                 onConfirm={tornarBotaoVisivel}
-                                isVisible = {modalVisible1}
+                                isVisible={modalVisible1}
                                 onClose={() => setModalVisible1(false)}
-                                                                    
-                                                />
-
+                            />
                             <ModalTemplate
-                                bodyText="Você já realizou suas atividades do dia, volte amanha para mais!"
+                                bodyText="Você já realizou suas atividades do dia, volte amanhã para mais!"
                                 confirmButtonText="Voltar"
-                                isVisible = {modalVisible2}
+                                isVisible={modalVisible2}
                                 onClose={() => setModalVisible2(false)}
-                                                />
-
-                        <AtividadeCard
-                            dadosAtividades={dadosAtividades}
-                            listaAtividades={listaAtividades}
-                            titulo='Atividade recomendada'
-                            onPressAtividade={() => {
-                                const grupoAtividadesId = dadosAtividades.atividades[0]._id; 
-                                console.log(grupoAtividadesId);
-                                navigation.navigate('GrupoAtividadesTela', { id: grupoAtividadesId });       
-                            }}
-                            onPressExercicio={(atividadeId) => {
-                                handleOpenModal(atividadeId)       
-                            }}
-                        />
+                            />
+                            <AtividadeCard
+                                dadosAtividades={dadosAtividades}
+                                listaAtividades={listaAtividades}
+                                titulo='Próxima atividade'
+                                onPressAtividade={() => {
+                                    const grupoAtividadesId = dadosAtividades?._id;
+                                    navigation.navigate('GrupoAtividadesTela', { id: grupoAtividadesId });
+                                }}
+                                onPressExercicio={(atividadeId) => handleOpenModal(atividadeId)}
+                            />
                         </VStack>
                     )}
                 </VStack>
 
-                {carregadoGrafico && (
-                    <VStack width='90%' mt='5%' alignItems='center'>
-                        <VStack
-                            paddingTop={2}
-                            paddingBottom={2}
-                            backgroundColor='roxoClaro'
-                            width='100%'
-                            alignItems='center'
-                            justifyContent='center'
-                            borderWidth='2'
-                        >
-                            <Titulo fontSize='xl' bold color='black'>Desempenho em atividades</Titulo>
-                        </VStack>
-
-                        <VStack width='100%' alignItems='center' justifyContent='center' borderWidth='2' mt='3%' padding={4} bg='roxoClaro'>
-                            <Graficos
-                                labels={dataFinalizadas}
-                                data={pontuacoesFinais}
-                                quantidade={7}
-                            />
+                {carregado === false && (
+                    <VStack borderWidth={0} borderRadius={10} w='93%' alignItems='center'>
+                        <VStack flex={1}>
+                            <Titulo fontSize='xl' mt='5%' mb='5%' bold color='black'>Aguenta ai</Titulo>
+                            <Titulo fontSize='md' color='black'>Em breve teremos novas atividades! Até lá, que tal ficar de olho em nossas redes sociais?</Titulo>
+                            <Titulo mt='4%' mb='5%' fontSize='lg' bold color='black'>Nos acompanhe em nosso Instagram!</Titulo>
+                            <VStack flexDirection='row' padding='4%' alignSelf='center' w='90%'>
+                                <Ionicons
+                                    name={'logo-instagram'}
+                                    size={50}
+                                    color={'black'}
+                                    onPress={() => Linking.openURL('https://www.instagram.com/stimular.multidisciplinar')}
+                                />
+                            </VStack>
                         </VStack>
                     </VStack>
                 )}
+
+<Titulo textAlign='left' mt='5%' bold color='black' mb='5%'>Como funciona?</Titulo>
+<Titulo textAlign='left'  color='black'  fontSize='md' padding='3%'>A Terapia ABA é um método individualizado que se adapta às necessidades do paciente. Seguindo:</Titulo>
+
+                    
+
+                    <VStack borderWidth={2} borderRadius={10} w='80%' mb='5' bg='white'>
+                            <Titulo fontSize='md' padding='2%' bold color='black'>Plano personalizado:</Titulo>
+                            <Titulo alignSelf='flex-start' fontSize='sm' ml='5%'textAlign='left' color='black' mb='3%' >É realizada uma avaliação dos marcos do desenvolvimento para elaboração de um plano de ensino individualizado com base em seus pontos fortes, desafios e objetivos.</Titulo>
+                    </VStack>
+                    <VStack borderWidth={2} borderRadius={10} w='80%' mb='5' bg='white'>
+                            <Titulo fontSize='md' padding='2%' bold color='black'>Aprendizagem:</Titulo>
+                            <Titulo alignSelf='flex-start' fontSize='sm' ml='5%'textAlign='left' color='black' mb='3%' >Habilidades importantes como comunicação, habilidades de autoregulação, interação social e comportamento adequado são ensinadas e treinadas.</Titulo>
+                    </VStack>
+                    <VStack borderWidth={2} borderRadius={10} w='80%' mb='5'bg='white'>
+                            <Titulo fontSize='md' padding='2%' bold color='black'>Acompanhamento:</Titulo>
+                            <Titulo alignSelf='flex-start' fontSize='sm' ml='5%'textAlign='left' color='black' mb='3%'>A equipe acompanha de perto o progresso realizando graficos e ajustando o plano de ensino sempre que necessário.</Titulo>
+                    </VStack>
+
+                    <Botao style={{ flex: 1 }} onPress={() => Linking.openURL("https://stimular.com.br")}>Quer saber mais?</Botao>
+
+                
+
+                    
             </VStack>
         </ScrollView>
     );

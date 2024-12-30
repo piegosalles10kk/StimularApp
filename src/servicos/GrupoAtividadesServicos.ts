@@ -15,6 +15,39 @@ export async function pegarGruposAtividadesNivel(token: string, nivel: number, g
     }
   }
 
+  export async function pegarGruposAtividadesAuto(token: string) {
+    try {
+      const resultado = await api.get(`/grupoatividadesAuto`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return resultado.data;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+ 
+  export async function criarGruposAtividadesAuto(token) {
+    try {
+      const resultado = await api.post(
+        '/grupoatividadesAuto',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return resultado.data;
+    } catch (error) {
+      console.error(error); // Use console.error para registrar erros
+      return null;
+    }
+  }
+  
+
 export async function pegarGruposAtividadesPorId(id: string ,token: string){
     try {
         const resultado = await api.get(`/grupoatividades/${id}`, {

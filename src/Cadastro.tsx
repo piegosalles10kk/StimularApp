@@ -22,12 +22,14 @@ export default function Cadastro({ navigation }) {
     const [numSecao, setNumSecao] = useState(0);
     const [dados, setDados] = useState<{ [key: string]: any }>({});
 
+
     const toast = useToast();
 
     const avancarSecao = () => {
         if (numSecao < secoes.length - 1) {
             setNumSecao(numSecao + 1);
         } else {
+            
             cadastrar();
         }
     };
@@ -63,6 +65,7 @@ export default function Cadastro({ navigation }) {
        const anoNovo = novaData.getFullYear();
        
        const validade = `${diaNovo}/${mesNovo}/${anoNovo}`;
+       
 
         const resultado = await cadastrarPaciente({
             email: dados.email,
@@ -74,10 +77,13 @@ export default function Cadastro({ navigation }) {
             tipoDeConta: 'Paciente',
             foto: 'https://stimularmidias.blob.core.windows.net/midias/6c0ab0a4-110f-4ce5-88c3-9c39ee10dba6.jpg',
             profissional: [
-                {
-                    idDoProfissional: "672243e4effa46003373d4f4",
-                    nome: "Stimular"
-                }
+                { idDoProfissional: '672243e4effa46003373d4f4', nome: 'Stimular' },
+                { idDoProfissional: '6769bece33989546e360a712', nome: 'Crislaine Freires de Brito' },
+                { idDoProfissional: '6769beb733989546e360a6dc', nome: 'Daniela Aparecida Marques Alamino' },
+                { idDoProfissional: '6769be8d33989546e360a6a7', nome: 'Thally Caponi' },
+                { idDoProfissional: '6769be6633989546e360a673', nome: 'Kátea Paula de Lima' },
+                { idDoProfissional: '6769be0333989546e360a640', nome: 'Isabel Aguiar' },
+                { idDoProfissional: '671a857002bddbf20cba4ae0', nome: 'Diego Salles' },
             ],
             validade: validade,
             moeda: {
@@ -85,8 +91,17 @@ export default function Cadastro({ navigation }) {
                 dataDeCriacao: new Date()
             },
             nivel: 1,
-            ativo: true
+            ativo: true,
+            erros: {
+                socializacao: [],
+                cognicao: [],
+                linguagem: [],
+                autoCuidado: [],
+                motor: [],
+            },
         });
+
+        
 
         if (resultado) {
             
@@ -128,9 +143,10 @@ export default function Cadastro({ navigation }) {
 }
             
         } else {
-            Alert.alert('Erro', 'Erro ao cadastrar o paciente. Tente novamente.');
+            Alert.alert('Atenção', 'Erro ao cadastrar o paciente. Verifique os dados e tente novamente.');
         }
     };
+    
 
     return (
         <DismissKeyboard>
@@ -150,25 +166,30 @@ export default function Cadastro({ navigation }) {
                     <ImagemLogo />
                     <Titulo mb={3}>{secoes[numSecao].titulo}</Titulo>
                     <Box>
-                        {numSecao >= 0 && secoes[numSecao].entradaTexto.map(entrada => (
+                        {numSecao <= 3 && secoes[numSecao].entradaTexto.map(entrada => (
                             <EntradaTexto
                                 label={entrada.label}
                                 placeholder={entrada.placeholder}
                                 key={entrada.id}
                                 keyboardType={entrada.keyboardType}
-                                secureTextEntry={entrada.secureTextEntry}
+                                secureTextEntry={numSecao === 3 ? true : false}
                                 value={dados[entrada.name] || ''} // Usar '' se não houver valor
                                 onChangeText={(text) => atualizarDados(entrada.name, text)}
                                 type={entrada.type}
                             />
                         ))}
+
+
+                        
+
                     </Box>
-                    {numSecao > 0 && <Botao onPress={voltarSecao}>Voltar</Botao>}
                     {numSecao >= 0 && (
-                        <Botao mt={4} onPress={avancarSecao}>
+                        <Botao onPress={avancarSecao}>
                             {numSecao >= 3 ? 'Concluir' : 'Avançar'}
                         </Botao>
                     )}
+                    {numSecao > 0 && <Botao  mt={4} onPress={voltarSecao}>Voltar</Botao>}
+                   
                 </ScrollView>
             </KeyboardAvoidingView>
         </DismissKeyboard>

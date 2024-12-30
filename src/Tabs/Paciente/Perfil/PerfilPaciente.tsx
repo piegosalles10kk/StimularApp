@@ -1,7 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TouchableOpacity } from 'react-native';
 import { VStack, View, ScrollView, Avatar, HStack, Modal, Image } from "native-base";
-import { Botao } from "../../../componentes/Botao";
 import { useEffect, useState } from "react";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 

@@ -119,33 +119,22 @@ const CriarUsuarioAdmin = ({ navigation }) => {
     const processImage = async (result) => {
         const source = {
             uri: result.assets[0].uri,
-            type: result.assets[0].type || 'image/jpeg', // Usar o tipo fornecido ou 'image/jpeg' como padrão.
-            fileName: result.assets[0].fileName || 'photo.jpg', // Usar o nome do arquivo fornecido ou 'photo.jpg' como padrão.
+            type: result.assets[0].type || 'image/jpeg',
+            fileName: result.assets[0].fileName || 'photo.jpg'
         };
     
         const email = dados.email;
     
-        try {
-            // Defina o tempo limite para 10 segundos (10.000 ms)
-            const timeout = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Tempo de espera excedido')), 10000)
-            );
+        const response = await enviarFotoDePerfil(email, source );
     
-            // Execute a requisição e aguarde a resposta
-            const response = await Promise.race([enviarFotoDePerfil(email, source), timeout]);
-    
-            if (response) {
-                setSelectedAvatar(response.url);
-                Alert.alert('Imagem enviada com sucesso!');
-            } else {
-                Alert.alert('Erro ao enviar a imagem');
-            }
-        } catch (error) {
-            console.error('Erro ao enviar a imagem:', error.message);
-            Alert.alert('Ocorreu um erro ao enviar a imagem. Tente novamente.');
-        } finally {
-            setShowModal(false);
+        if (response) {
+            setSelectedAvatar(response.url);
+            Alert.alert('Imagem enviada com sucesso!');
+        } else {
+            Alert.alert('Erro ao enviar a imagem');
         }
+    
+        setShowModal(false);
     };
     
 
@@ -177,7 +166,7 @@ const CriarUsuarioAdmin = ({ navigation }) => {
                 dataDeNascimento: dados.dataDeNascimento,
                 telefone: dados.telefone,
                 nivel: dados.nivel,
-                grupo: dados.grupo,
+                grupo: dados.grupo || ["TEA"],
                 senha: 'stimular123',
                 confirmarSenha: 'stimular123',
                 profissional: [

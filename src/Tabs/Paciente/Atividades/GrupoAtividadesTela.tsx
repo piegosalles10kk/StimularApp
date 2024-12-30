@@ -217,7 +217,6 @@ export default function GrupoAtividadesTela({ navigation }) {
                     
                     <VStack mt='17%'> 
                         <Titulo color='black'bold >{dadosAtividades.grupoAtividades.nomeGrupo}</Titulo>
-                        <Titulo fontSize='md' color='black' mb='4%'>{`Recomendado para: (${dadosAtividades.grupoAtividades.dominio})`}</Titulo>
                         <Titulo fontSize='md' textAlign='start' padding='2%'>{dadosAtividades.grupoAtividades.descricao}</Titulo>  
 
                         

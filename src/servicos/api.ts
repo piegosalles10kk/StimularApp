@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const link = 'http://167.88.33.130:3001'
+const link = 'https://stimularweb.shop'
+const local = 'http://localhost:3001'
 
 const api = axios.create({
     baseURL: link,
