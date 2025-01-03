@@ -14,7 +14,8 @@ import RecuerarSenha from "./RecuperarSenha";
 import AlterarPerfilAdmin from "./Tabs/Admin/EditarUsuario/AlterarPerfilAdmin";
 import CriarUsuarioAdmin from "./Tabs/Admin/EditarUsuario/CriarUsuarioAdmin";
 import CriarAtividade from "./Tabs/Admin/Atividades/CriarAtividadeAdmin";
-
+import DadosUsuario from "./Tabs/Profissional/TabsProfissional/DadosUsuario";
+import AlterarPerfilProfissional from "./Tabs/Profissional/Perfil/AlterarPerfilProfissional";
 
 const Tab = createNativeStackNavigator();
 
@@ -86,6 +87,17 @@ export default function Rotas() {
                 <Tab.Screen 
                     name="CriarAtividade" 
                     component={CriarAtividade} 
+                    options={{ headerShown: false }}
+                />
+
+                <Tab.Screen 
+                    name="DadosUsuario" 
+                    component={DadosUsuario} 
+                    options={{ headerShown: false }}
+                />
+                <Tab.Screen 
+                    name="AlterarPerfilProfissional" 
+                    component={AlterarPerfilProfissional} 
                     options={{ headerShown: false }}
                 />
 

@@ -122,6 +122,20 @@ export async function pegarDadosUsuarioGeral( token: string){
   }
 }
 
+export async function pegarDadosUsuarioProfissional( token: string){
+  try {
+      const resultado = await api.get(`/user-ativos-paciente`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return resultado.data;
+  }catch(error){
+      console.log(error);
+      return null
+  }
+}
+
 export async function desativarConta(id: string, token: string) {
   try {
     const resultado = await api.put(`/usuario/status/${id}`, null, {

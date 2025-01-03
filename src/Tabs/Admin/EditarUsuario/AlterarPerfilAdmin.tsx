@@ -301,7 +301,7 @@ const AlterarPerfilAdmin = ({ navigation }) => {
         <DismissKeyboard>
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <FlatList
-            data={['nome', 'email', 'dataDeNascimento', 'telefone', 'selectTipoDeConta', 'selectNivel', 'grupo']}
+            data={['nome', 'email', 'dataDeNascimento', 'telefone']}
             keyExtractor={(item) => item}
             contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', alignItems: 'center' }}
             renderItem={renderItem}
@@ -322,8 +322,7 @@ const AlterarPerfilAdmin = ({ navigation }) => {
             isVisible={modal2}
             onClose={() => setModal2(false)}
         /> 
-        <Botao alignSelf='center' onPress={handleSalvar}>Salvar</Botao>
-        <Botao alignSelf='center' mb='30%' onPress={abrirModal2}>Apagar conta</Botao>
+        <Botao alignSelf='center'mb='30%' onPress={handleSalvar}>Salvar</Botao>
         <Modal visible={showModal} transparent animationType="slide">
             <VStack style={styles.modalContainer}>
                 <VStack bg='white' p={5} borderRadius={10} style={styles.modalContent}>

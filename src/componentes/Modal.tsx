@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Modal, Text, VStack } from 'native-base';
 import { Botao } from './Botao'; // Importar seu botão customizado se necessário
+import { Titulo } from './Titulo';
 
 interface Props {
     botao?: string; // Botão para abrir o modal, opcional
@@ -63,7 +64,7 @@ const ModalTemplate: React.FC<Props> = ({
                 <Modal.Content maxWidth={width} maxHeight={height} alignSelf="center"> {/* Aplicando largura e altura */}
                     <Modal.Body>
 
-                        <Text alignSelf="center" mt="4%" bold fontSize='md'>{bodyText}</Text>
+                        <Titulo alignSelf="center" mt="4%" bold fontSize='md' color={'black'}>{bodyText}</Titulo>
                         <VStack space={2} mt={4} alignItems="center">
                             {onConfirm && confirmButtonText && (
                                 <Botao onPress={handleConfirm} alignSelf="center">

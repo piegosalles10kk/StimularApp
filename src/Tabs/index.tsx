@@ -11,7 +11,7 @@ import AtividadesProfissional from './Profissional/AtividadesProfissional';
 import AtividadesAdmin from './Admin/AtividadesAdmin';
 
 import PerfilPaciente from './Paciente/Perfil/PerfilPaciente';
-import PerfilProfissional from './Profissional/PerfilProfissional';
+import PerfilProfissional from './Profissional/Perfil/PerfilProfissional';
 import PerfilAdmin from './Admin/PerfilAdmin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
@@ -63,14 +63,9 @@ const tabsPaciente = [
 
 const tabsProfissional = [
     {
-        name: 'Principal',
+        name: 'Pacientes',
         component: PrincipalProfissional,
-        icon: 'home'
-    },
-    {
-        name: 'Atividades',
-        component: AtividadesProfissional,
-        icon: 'book'
+        icon: 'globe'
     },
     {
         name: 'Perfil',
@@ -84,11 +79,6 @@ const tabsAdmin = [
         name: 'Atividades',
         component: PrincipalAdmin,
         icon: 'documents-outline'
-    },
-    {
-        name: 'Criar',
-        component: AtividadesAdmin,
-        icon: 'add'
     },
     {
         name: 'Contas',

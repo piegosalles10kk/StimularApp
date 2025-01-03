@@ -106,6 +106,10 @@ export interface Alternativas {
           valor: number,
           dataDeCriacao: Date
          };
+         informacoes: {
+          formacao: string,
+          descricao: string,
+      };
         nivel: number;
         nome: string;
         email: string;
@@ -119,7 +123,12 @@ export interface Alternativas {
         grupo: string[];
         gruposDeAtividadesEmAndamento: GruposDeAtividadesEmAndamento[];
         gruposDeAtividadesFinalizadas: GruposDeAtividadesFinalizadas[];
-        descricao: Descricao[];
+        descricao: {
+          autor: string;
+          nomeAutor: string;
+          comentario: string;
+          dataCriacao: Date;
+        };
         pacientes: Pacientes[];
         gruposDeAtividadesCriadas: GrupoAtividades[];
         pontuacoesPorGrupo: {
@@ -129,6 +138,13 @@ export interface Alternativas {
         recupararSenha: boolean;
         codigoRecuperarSenha: string;
         ativo: boolean;
+        erros: {
+          socializacao: [],
+          cognicao: [],
+          linguagem: [],
+          autoCuidado: [],
+          motor: [],
+      },
     }
   }
 

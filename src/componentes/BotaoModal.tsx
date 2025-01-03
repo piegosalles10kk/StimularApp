@@ -42,7 +42,7 @@ const EditableModal: React.FC<Props> = ({
   return (
     <>
       <Botao onPress={handleOpenModal}
-      mb='10%'
+      mb='5%'
       >{botao}</Botao>
       <Modal isOpen={modalVisible} onClose={handleCloseModal}>
         <Modal.Content maxWidth={'90%'}>

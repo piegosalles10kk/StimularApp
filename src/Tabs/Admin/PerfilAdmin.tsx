@@ -1,60 +1,57 @@
 import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { VStack, ScrollView } from "native-base";
+import { VStack, Spinner, Text } from "native-base";
 import { Botao } from "../../componentes/Botao";
-import CardAtividadeAdmin from "../../componentes/CardAtividadeAdmin";
-import { tokenMidia } from "../../utils/token";
-import { Titulo } from "../../componentes/Titulo";
 import { ImagemLogo } from "../../componentes/ImagemLogo";
 import { pegarDadosUsuarioGeral } from "../../servicos/UserServico";
-import { UsuarioGeral2 } from "../../interfaces/UsuarioGeral";
 import EditableModal from "../../componentes/BotaoModal";
+import { WebView } from 'react-native-webview';
 
 export default function PerfilAdmin({ navigation }) {
-    const [grupoUsuario, setGrupoUsuarios] = useState([] as UsuarioGeral2[]);
-    const [carregado, setCarregando] = useState(false);
+    const [isLoaded, setIsLoaded] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
     useEffect(() => {
-        async function dadosUsuario() {
-            const token = await AsyncStorage.getItem('token');
-            if (!token) {
-                console.error('erro ao pegar o token');
-                return;
-            }
+        const fetchData = async () => {
+            try {
+                const token = await AsyncStorage.getItem('token');
+                if (!token) {
+                    console.error('Erro ao pegar o token');
+                    return;
+                }
 
-            const resultado = await pegarDadosUsuarioGeral(token);
-
-            if (resultado && resultado.users) {
-                setGrupoUsuarios(resultado.users);
-                setCarregando(true);
-                //console.log(resultado.users);
-            } else {
-                console.log('erro ao pegar os grupos de atividades');
+                const result = await pegarDadosUsuarioGeral(token);
+                if (result && result.users) {
+                    setIsLoaded(true);
+                } else {
+                    console.error('Erro ao pegar os grupos de atividades');
+                }
+            } catch (err) {
+                console.error(err);
             }
-        }
-        dadosUsuario();
+        };
+
+        fetchData();
     }, []);
 
-    function deslogar() {
-        AsyncStorage.removeItem('id');
-        AsyncStorage.removeItem('token');
-        AsyncStorage.removeItem('tipoDeConta');
+    const logout = async () => {
+        await AsyncStorage.removeItem('id');
+        await AsyncStorage.removeItem('token');
+        await AsyncStorage.removeItem('tipoDeConta');
         navigation.replace('Login');
-    }
+    };
 
-    const editarMeuPerfil = async () => {
-        const usuarioId = await AsyncStorage.getItem('id');
-        navigation.navigate('AlterarPerfilAdmin', { id: usuarioId });
-    }
+    const editProfile = async () => {
+        const userId = await AsyncStorage.getItem('id');
+        navigation.navigate('AlterarPerfilAdmin', { id: userId });
+    };
 
-    const handleCancel = () => {
-        setModalVisible(false);
-      };
-      
+    const handleCancel = () => setModalVisible(false);
 
     return (
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <VStack flex={1} alignItems='center' bg='white'>
             <ImagemLogo
                 style={{
                     marginTop: '5%',
@@ -62,37 +59,33 @@ export default function PerfilAdmin({ navigation }) {
                     height: 150,
                 }}
             />
-            <VStack alignItems='center'>
-                <Titulo bold color='black' padding='2%'>Contas cadastradas</Titulo>
-
-                
-
-                {carregado && (
-                    <VStack alignItems='center'>
-                        {grupoUsuario.map((usuario) => (
-                            <CardAtividadeAdmin
-                                key={usuario._id}
-                                titulo={usuario.nome}
-                                descricao={`Tipo de conta: (${usuario.tipoDeConta}) \nGrupo: ${usuario.grupo} ${usuario.nivel} ano(s)`}
-                                avatarUri={usuario.foto || `https://stimularmidias.blob.core.windows.net/midias/6c0ab0a4-110f-4ce5-88c3-9c39ee10dba6.jpg${tokenMidia}`}
-                                onPress={() => navigation.navigate('AlterarPerfilAdmin', { id: usuario._id })}
-                                id={usuario._id}
-                                buttonVisible={true}
-                            />
-                        ))}
-                    </VStack>
-                )}
-
-                <Botao mb='-5%' onPress={editarMeuPerfil}>Editar conta</Botao>
-                <EditableModal
-                    botao="Sair da conta"
-                    bodyText="Ao clicar em sim voce irá sair da sua conta. Tem certeza que deseja continuar?"
-                    confirmButtonText="Sim"
-                    cancelButtonText="Não"
-                    onConfirm={deslogar}
-                    onCancel={handleCancel}
+            <Botao mb='-5%' onPress={editProfile}>Editar minha conta</Botao>
+            <EditableModal
+                botao="Sair da conta"
+                bodyText="Ao clicar em sim você irá sair da sua conta. Tem certeza que deseja continuar?"
+                confirmButtonText="Sim"
+                cancelButtonText="Não"
+                onConfirm={logout}
+                onCancel={handleCancel}
+            />
+            
+            {isLoaded && (
+                <VStack flex={1} width="100%">
+                    {loading && <Spinner size="lg" />}
+                    <WebView
+                        source={{ uri: 'http://167.88.33.130:3000/usuarios' }}
+                        style={{ width: 'auto', height: '100%', marginTop: '-30%' }}
+                        onLoad={() => setLoading(false)}
+                        onError={(syntheticEvent) => {
+                            const { nativeEvent } = syntheticEvent;
+                            console.warn('WebView error: ', nativeEvent);
+                            setError('Ocorreu um erro ao carregar a página.');
+                            setLoading(false);
+                        }}
                     />
-            </VStack>
-        </ScrollView>
+                    {error && <Text color="red.500">{error}</Text>}
+                </VStack>
+            )}
+        </VStack>
     );
 }

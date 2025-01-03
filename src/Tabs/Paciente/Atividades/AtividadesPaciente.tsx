@@ -62,83 +62,90 @@ export default function AtividadesPaciente({ navigation }) {
         }
     };
 
-const atualizarDadosAtividades = async () => {
-    const [usuarioID, token] = await Promise.all([AsyncStorage.getItem('id'),AsyncStorage.getItem('token')]);
-    if (!usuarioID || !token) {
-        console.error('Erro ao obter dados do usuário ou token');
-        return;
-    }
-
-    try {
-        const resultadoAtividade = await pegarGruposAtividadesAuto(token);
-        setDadosAtividades(resultadoAtividade.gruposAtividades[0]);
-        setListaAtividades(resultadoAtividade.gruposAtividades[0].atividades || []);
-
-        if (!dadosUsuario.user) {
-            console.error('Erro ao obter dados do usuário');
+    const atualizarDadosAtividades = async () => {
+    
+        const [usuarioID, token] = await Promise.all([
+            AsyncStorage.getItem('id'),
+            AsyncStorage.getItem('token')
+        ]);
+    
+        if (!usuarioID || !token) {
+            console.error('Erro ao obter dados do usuário ou token');
             return;
         }
-
-        let gruposDeAtividadesFinalizadas = dadosUsuario.user.gruposDeAtividadesFinalizadas || [];
-
-        while (gruposDeAtividadesFinalizadas === undefined) {
-            gruposDeAtividadesFinalizadas = dadosUsuario.user.gruposDeAtividadesFinalizadas || [];
-            console.log(gruposDeAtividadesFinalizadas);
-        }
-
-
-
-        const processarAtividades = (gruposDeAtividadesFinalizadas) => {
-            const dataFinalizadasTemp = gruposDeAtividadesFinalizadas.map(atividade => atividade.dataFinalizada);
-        
-            const pontuacoesPorTipo = {
-                socializacao: [],
-                cognicao: [],
-                linguagem: [],
-                autoCuidado: [],
-                motor: []
-            };
-        
-            gruposDeAtividadesFinalizadas.forEach(atividade => {
-                atividade.respostasFinais.forEach(resposta => {
-                    // Adiciona a pontuação ao array correspondente ao tipo de atividade
-                    pontuacoesPorTipo[resposta.tipoAtividade].push(resposta.porcentagem);
+        console.log(`Token: ${token} id: ${usuarioID}`);
+    
+    
+        try {
+            const resultadoAtividade = await pegarGruposAtividadesAuto(token);
+            setDadosAtividades(resultadoAtividade.gruposAtividades[0]);
+            setListaAtividades(resultadoAtividade.gruposAtividades[0].atividades || []);
+    
+    
+            if (!dadosUsuario || !dadosUsuario.user) {
+                console.error('Erro ao obter dados do usuário');
+                return;
+            }
+    
+    
+    
+            let gruposDeAtividadesFinalizadas = dadosUsuario.user.gruposDeAtividadesFinalizadas || [];
+    
+            while (gruposDeAtividadesFinalizadas === undefined) {
+                gruposDeAtividadesFinalizadas = dadosUsuario.user.gruposDeAtividadesFinalizadas || [];
+                //console.log(gruposDeAtividadesFinalizadas);
+            }
+    
+    
+    
+            const processarAtividades = (gruposDeAtividadesFinalizadas) => {
+                const dataFinalizadasTemp = gruposDeAtividadesFinalizadas.map(atividade => atividade.dataFinalizada);
+    
+                const pontuacoesPorTipo = {
+                    socializacao: [],
+                    cognicao: [],
+                    linguagem: [],
+                    autoCuidado: [],
+                    motor: []
+                };
+    
+                gruposDeAtividadesFinalizadas.forEach(atividade => {
+                    atividade.respostasFinais.forEach(resposta => {
+                        // Adiciona a pontuação ao array correspondente ao tipo de atividade
+                        pontuacoesPorTipo[resposta.tipoAtividade].push(resposta.porcentagem);
+                    });
                 });
-            });
-        
-            const pontuacoesFinaisTemp = [
-                pontuacoesPorTipo.socializacao,
-                pontuacoesPorTipo.cognicao,
-                pontuacoesPorTipo.linguagem,
-                pontuacoesPorTipo.autoCuidado,
-                pontuacoesPorTipo.motor
-            ];
-        
-            //console.log(pontuacoesPorTipo); // Adicione essa linha para o debug
-        
-            setDataFinalizadas(dataFinalizadasTemp);
-            setPontuacoesFinais(pontuacoesFinaisTemp);
-            setCarregandoGrafico(dataFinalizadasTemp.length > 0 && pontuacoesFinaisTemp.length > 0);
-        };
-        
-        
-        // Exemplo de como chamar a função
-        processarAtividades(gruposDeAtividadesFinalizadas);
-        
-        
-    } catch (error) {
-        console.error('Erro ao buscar atividades:', error);
-        if (error.response && error.response.status === 404) {
-            Alert.alert("Erro ao buscar atividades", "Atividades não encontradas. Por favor, tente novamente mais tarde.");
+    
+                const pontuacoesFinaisTemp = [
+                    pontuacoesPorTipo.socializacao,
+                    pontuacoesPorTipo.cognicao,
+                    pontuacoesPorTipo.linguagem,
+                    pontuacoesPorTipo.autoCuidado,
+                    pontuacoesPorTipo.motor
+                ];
+    
+                //console.log(pontuacoesPorTipo); // Adicione essa linha para o debug
+    
+    
+                for (let i = 0; i < 10; i++) {
+                    setDataFinalizadas(dataFinalizadasTemp);
+                    setPontuacoesFinais(pontuacoesFinaisTemp);
+                    setCarregandoGrafico(dataFinalizadasTemp.length > 0 && pontuacoesFinaisTemp.length > 0);
+                }
+            };
+    
+            processarAtividades(gruposDeAtividadesFinalizadas);
+    
+        } catch (error) {
+            console.error('Erro ao buscar atividades:', error);
+            if (error.response && error.response.status === 404) {
+                Alert.alert("Erro ao buscar atividades", "Atividades não encontradas. Por favor, tente novamente mais tarde.");
+            }
+        } finally {
+            setCarregando(true);
         }
-    } finally {
-        setCarregando(true);
     }
-};
-
-for (let i = 0; i < 2; i++) {
-    atualizarDadosAtividades()
-}
+    
 
     useEffect(() => {
         async function fetchDadosUsuario() {
@@ -152,10 +159,19 @@ for (let i = 0; i < 2; i++) {
 
             const resultado = await pegarDadosUsuario(usuarioID, token);
             setDadosUsuario(resultado);
-            atualizarDadosAtividades();
+            
         }
         fetchDadosUsuario();
+        
+            atualizarDadosAtividades()
     }, []);
+
+    useEffect(() => {
+        if(dadosUsuario){
+            atualizarDadosAtividades()
+        }
+    }, [dadosUsuario]);
+    
 
     const handleOpenModal = (atividadeIdParam: string) => {
         setAtividadeId(atividadeIdParam);
@@ -211,9 +227,7 @@ for (let i = 0; i < 2; i++) {
                 )}
                     <Titulo alignSelf='flex-start' fontSize='md' ml='5%' mt='2%'textAlign='left' color='black'>O grafico acima demonstra a evolução do usuário com relação aos seus resultados recentes.</Titulo>
                     
-                    <Titulo textAlign='left' mt='5%' bold color='black'>Precisa de ajuda?</Titulo>
-
-                    <Botao mt='5%'>Consulte nossa lista de profissionais</Botao>
+                
                     
                 <VStack width='100%' mt='5%'>
                     {carregado && (
@@ -263,8 +277,8 @@ for (let i = 0; i < 2; i++) {
                     </VStack>
                 )}
 
-<Titulo textAlign='left' mt='5%' bold color='black' mb='5%'>Como funciona?</Titulo>
-<Titulo textAlign='left'  color='black'  fontSize='md' padding='3%'>A Terapia ABA é um método individualizado que se adapta às necessidades do paciente. Seguindo:</Titulo>
+            <Titulo textAlign='left' mt='5%' bold color='black' mb='5%'>Como funciona?</Titulo>
+            <Titulo textAlign='left'  color='black'  fontSize='md' padding='3%'>A Terapia ABA é um método individualizado que se adapta às necessidades do paciente. Seguindo:</Titulo>
 
                     
 

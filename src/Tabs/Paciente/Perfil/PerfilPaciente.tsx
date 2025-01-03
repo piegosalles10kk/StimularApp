@@ -275,14 +275,16 @@ useEffect(() => {
         );
     }
 })}
+<VStack mt='20%' >
     <EditableModal
-      botao="Sair da conta"
+      botao="Sair da conta                     "
       bodyText="Ao clicar em sim voce irá sair da sua conta. Tem certeza que deseja continuar?"
       confirmButtonText="Sim"
       cancelButtonText="Não"
       onConfirm={deslogar}
       onCancel={handleCancel}
     />
+    </VStack>
                
             </VStack>}
         </ScrollView>
