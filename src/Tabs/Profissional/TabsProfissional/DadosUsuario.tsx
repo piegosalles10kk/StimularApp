@@ -198,9 +198,14 @@ export default function DadosUsuario( {navigation}) {
 
                     </VStack>   
                 )}
-
-
-                
+    <EditableModal
+                    botao="Solicitar nova avaliação"
+                    bodyText="Ao clicar em 'SIM', será realizada uma nova avaliação inicial para o paciente. Deseja continuar?"
+                    confirmButtonText="Sim"
+                    cancelButtonText="Não"
+                    onConfirm={mudarGrupo}
+                    onCancel={handleCancel}
+                /> 
                 
                 <VStack mb='10%' borderWidth={2} mt={'5%'} w='90%' bg={'yellow.100'} shadow={3}>
                 <Titulo mt='10%' textAlign='left'  alignSelf='flex-start' ml='5%' bold color='black'>Detalhes do caso</Titulo>

@@ -40,11 +40,11 @@ export default function PrincipalPaciente({ navigation }) {
             if (atividadeEmAndamento.grupoAtividadesId === grupoAtividadesId) {
                 navigation.navigate('ExercicioTela', { atividadeId: atividadeIdParam, idGrupoAtividades: grupoAtividadesId });
             } else {
-                setModalVisible1(true);
+                navigation.navigate('GrupoAtividadesTela', { id: grupoAtividadesId });
             }
         } else {
             console.warn('Nenhuma atividade em andamento encontrada.');
-            setModalVisible1(true);
+            navigation.navigate('GrupoAtividadesTela', { id: grupoAtividadesId });
         }
     };
 

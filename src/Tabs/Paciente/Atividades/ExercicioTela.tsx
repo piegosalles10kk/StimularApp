@@ -65,139 +65,140 @@ export default function ExercicioTela({ navigation }) {
 
     const idGrupoAtividades = (route.params as RouteParams).idGrupoAtividades;
 
-    useEffect(() => {
 
-        async function dadosAtividade() {
 
-            const usuarioID = await AsyncStorage.getItem('id');
+    const dadosAtividade= async () => {
+        const usuarioID = await AsyncStorage.getItem('id');
 
-            if (!usuarioID) {
+        if (!usuarioID) {
 
-                console.error('erro ao pegar o id do usuario');
+            console.error('erro ao pegar o id do usuario');
 
-                return;
-
-            }
-
-   
-
-            const token = await AsyncStorage.getItem('token');
-
-            if (!token) {
-
-                console.error('erro ao pegar o token');
-
-                return;
-
-            }
-
-   
-
-            try {
-
-                const grupoAtividades = await pegarGruposAtividadesPorId(idGrupoAtividades, token);
-
-                //console.log("Grupo de Atividades:", grupoAtividades);
-
-   
-
-                const resultado = await pegarDadosUsuario(usuarioID, token);
-
-                //console.log("Dados do Usuário:", resultado);
-
-   
-
-                if (resultado) {
-
-                    setDadosUsuario(resultado);
-
-                    const resultadoAtividade = await pegarAtividadesPorId(idGrupoAtividades, idAtividade, token);
-
-   
-
-                    setAtividadeTela(resultadoAtividade.atividade);
-
-                    setExercicios(resultadoAtividade.atividade.exercicios);
-
-                    setAlternativas(resultadoAtividade.atividade.exercicios[0].alternativas);
-                    
-
-                                       
-
-   
-
-                    const exerciciosTempUsuario = [];
-
-                    // Verifique se o resultado e a estrutura do usuário são válidos
-                    if (resultado && resultado.user) {
-                        const gruposAtividades = resultado.user.gruposDeAtividadesEmAndamento;
-                    
-                        // Verifique se gruposDeAtividadesEmAndamento existe e se não é vazio
-                        if (Array.isArray(gruposAtividades) && gruposAtividades.length > 0) {
-                            const respostas = gruposAtividades[0].respostas;
-                    
-                            // Verifique se respostas estão definidas e são um array
-                            if (Array.isArray(respostas)) {
-                                for (let resposta of respostas) {
-                                    const atividadeId = resposta.atividade_id;
-                    
-                                    // Adicione a lógica de verificação do ID da atividade
-                                    if (!exerciciosTempUsuario.includes(atividadeId)) {
-                                        exerciciosTempUsuario.push(atividadeId);
-                                    }
-                                }
-                            } else {
-                                console.error('Nenhuma resposta encontrada no grupo de atividades em andamento.');
-                            }
-                        } else {
-                            //console.error('Nenhum grupo de atividades em andamento encontrado.');
-                        }
-                    } else {
-                        console.error('Resultados do usuário não encontrados ou formato inválido.');
-                    }
-                    
-                    // Atualizar o estado com os IDs de exercícios do usuário
-                    setExerciciosDoUsuario(exerciciosTempUsuario);
-
-                    const exerciciosTempGrupo = [];
-
-                    for (let atividade of grupoAtividades.grupoAtividades.atividades) {
-
-                        const atividadeId = atividade._id;
-
-                        if (!exerciciosTempGrupo.includes(atividadeId)) {
-
-                            exerciciosTempGrupo.push(atividadeId);
-
-                        }
-
-                    }
-
-                    setExerciciosDoGrupo(exerciciosTempGrupo);
-
-                    console.log(exerciciosTempUsuario);
-
-                    setCarregando(true);
-
-                } else {
-
-                    console.error("erro ao pegar os dados do usuario");
-
-                }
-
-            } catch (error) {
-
-                console.error("Erro na obtenção de dados:", error);
-
-            }
+            return;
 
         }
 
+
+
+        const token = await AsyncStorage.getItem('token');
+
+        if (!token) {
+
+            console.error('erro ao pegar o token');
+
+            return;
+
+        }
+
+
+
+        try {
+
+            const grupoAtividades = await pegarGruposAtividadesPorId(idGrupoAtividades, token);
+
+            //console.log("Grupo de Atividades:", grupoAtividades);
+
+
+
+            const resultado = await pegarDadosUsuario(usuarioID, token);
+
+            //console.log("Dados do Usuário:", resultado);
+
+
+
+            if (resultado) {
+
+                setDadosUsuario(resultado);
+
+                const resultadoAtividade = await pegarAtividadesPorId(idGrupoAtividades, idAtividade, token);
+
+
+
+                setAtividadeTela(resultadoAtividade.atividade);
+
+                setExercicios(resultadoAtividade.atividade.exercicios);
+
+                setAlternativas(resultadoAtividade.atividade.exercicios[0].alternativas);
+                
+
+                                   
+
+
+
+                const exerciciosTempUsuario = [];
+
+                // Verifique se o resultado e a estrutura do usuário são válidos
+                if (resultado && resultado.user) {
+                    const gruposAtividades = resultado.user.gruposDeAtividadesEmAndamento;
+                
+                    // Verifique se gruposDeAtividadesEmAndamento existe e se não é vazio
+                    if (Array.isArray(gruposAtividades) && gruposAtividades.length > 0) {
+                        const respostas = gruposAtividades[0].respostas;
+                
+                        // Verifique se respostas estão definidas e são um array
+                        if (Array.isArray(respostas)) {
+                            for (let resposta of respostas) {
+                                const atividadeId = resposta.atividade_id;
+                
+                                // Adicione a lógica de verificação do ID da atividade
+                                if (!exerciciosTempUsuario.includes(atividadeId)) {
+                                    exerciciosTempUsuario.push(atividadeId);
+                                }
+                            }
+                        } else {
+                            console.error('Nenhuma resposta encontrada no grupo de atividades em andamento.');
+                        }
+                    } else {
+                        //console.error('Nenhum grupo de atividades em andamento encontrado.');
+                    }
+                } else {
+                    console.error('Resultados do usuário não encontrados ou formato inválido.');
+                }
+                
+                // Atualizar o estado com os IDs de exercícios do usuário
+                setExerciciosDoUsuario(exerciciosTempUsuario);
+
+                const exerciciosTempGrupo = [];
+
+                for (let atividade of grupoAtividades.grupoAtividades.atividades) {
+
+                    const atividadeId = atividade._id;
+
+                    if (!exerciciosTempGrupo.includes(atividadeId)) {
+
+                        exerciciosTempGrupo.push(atividadeId);
+
+                    }
+
+                }
+
+                setExerciciosDoGrupo(exerciciosTempGrupo);
+
+                console.log(exerciciosTempUsuario);
+
+                setCarregando(true);
+
+            } else {
+
+                console.error("erro ao pegar os dados do usuario");
+
+            }
+
+        } catch (error) {
+
+            console.error("Erro na obtenção de dados:", error);
+
+        }
+
+    }
+
+        useEffect(() => {
+
+            if(atividadeTela){
         dadosAtividade();
+            }
 
     }, []);
-
-
  
 
 
